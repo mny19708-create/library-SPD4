@@ -9,7 +9,7 @@ const api = axios.create({
   },
 });
 
-// แนบ Token อัตโนมัติถ้ามีผู้ใช้งานล็อกอิน
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
