@@ -1,0 +1,17 @@
+{
+  "name": "library-spd4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "db.seed.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:seed": "node db.seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^18.0.4",
+    "pg": "^8.23.0"
+  }
+}
