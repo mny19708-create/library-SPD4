@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="km" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងបណ្ណាល័យ - Admin Panel</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0d1117',
+                        cardbg: '#161b22',
+                        cardborder: '#30363d',
+                        accent: '#6366f1',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Kantumruy Pro', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0d1117; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(22, 27, 34, 0.9) 0%, rgba(13, 17, 23, 0.9) 100%);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-darkbg text-gray-100 h-screen flex overflow-hidden selection:bg-indigo-500 selection:text-white">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-72 bg-[#11161d] border-r border-[#21262d] flex flex-col justify-between shrink-0 transition-all duration-300 z-20">
+        <div>
+            <!-- Brand Logo -->
+            <div class="p-6 flex items-center space-x-3 border-b border-[#21262d]">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-book-open text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg tracking-wide text-white">បណ្ណាល័យឌីជីថល</h2>
+                    <p class="text-xs text-gray-400">ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</p>
+                </div>
+            </div>
+
+            <!-- Menu Items -->
+            <nav class="p-4 space-y-2">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 text-gray-400 hover:bg-[#21262d] hover:text-white">
+                    <i class="fa-solid fa-house-chimney w-5 text-center"></i>
+                    <span>ទំព័រដើម</span>
+                </button>
+                <button onclick="switchTab('borrow')" id="nav-borrow" class="nav-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 text-gray-400 hover:bg-[#21262d] hover:text-white">
+                    <i class="fa-solid fa-book-bookmark w-5 text-center"></i>
+                    <span>ការខ្ចីសៀវភៅ</span>
+                </button>
+                <button onclick="switchTab('rooms')" id="nav-rooms" class="nav-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 text-gray-400 hover:bg-[#21262d] hover:text-white">
+                    <i class="fa-solid fa-door-open w-5 text-center"></i>
+                    <span>ការកក់បន្ទប់សិក្សា</span>
+                </button>
+                <button onclick="switchTab('audit')" id="nav-audit" class="nav-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 text-gray-400 hover:bg-[#21262d] hover:text-white">
+                    <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+                    <span>ប្រព័ន្ធពិនិត្យ</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-[#21262d]">
+            <div class="flex items-center space-x-3 p-2 bg-[#161b22] rounded-xl border border-[#30363d]">
+                <div class="w-9 h-9 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+                    AD
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-sm font-semibold truncate text-white">Administrator</p>
+                    <p class="text-xs text-emerald-400 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> សកម្ម
+                    </p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-darkbg">
+        <!-- Top Header Bar -->
+        <header class="h-20 bg-darkbg/80 border-b border-[#21262d] px-8 flex justify-between items-center shrink-0 backdrop-blur-md">
+            <div id="header-title" class="text-xl font-bold text-white flex items-center gap-3">
+                <!-- Title dynamically updated -->
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="refreshData()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content View Container -->
+        <div class="flex-1 overflow-y-auto p-8 relative" id="content-container">
+
+            <!-- ================= VIEW 1: HOME (ទំព័រដើម) ================= -->
+            <div id="view-home" class="view-section space-y-6">
+                <!-- Welcome Banner -->
+                <div class="relative bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-cardbg border border-cardborder p-8 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="relative z-10 max-w-2xl">
+                        <span class="px-3 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 rounded-full text-xs font-semibold uppercase tracking-wider">Dashboard Overview</span>
+                        <h2 class="text-3xl font-bold mt-3 mb-2 text-white">សូមស្វាគមន៍មកកាន់ប្រព័ន្ធគ្រប់គ្រងបណ្ណាល័យ</h2>
+                        <p class="text-gray-300 text-sm leading-relaxed">ត្រួតពិនិត្យការខ្ចីសៀវភៅ ការកក់បន្ទប់សិក្សា និងទិន្នន័យស្ថិតិប្រចាំថ្ងៃទាំងអស់នៅកន្លែងតែមួយដោយសុវត្ថិភាព និងភាពងាយស្រួល។</p>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">សៀវភៅសរុប</p>
+                            <h3 class="text-2xl font-bold text-white mt-1">1,420</h3>
+                            <span class="text-xs text-emerald-400 mt-2 inline-flex items-center gap-1"><i class="fa-solid fa-arrow-up"></i> +12% ខែនេះ</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-book"></i>
+                        </div>
+                    </div>
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">ការខ្ចីសកម្ម</p>
+                            <h3 class="text-2xl font-bold text-white mt-1">84</h3>
+                            <span class="text-xs text-amber-400 mt-2 inline-flex items-center gap-1"><i class="fa-solid fa-clock"></i> កំពុងខ្ចី</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-book-bookmark"></i>
+                        </div>
+                    </div>
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">បន្ទប់សិក្សាសរុប</p>
+                            <h3 class="text-2xl font-bold text-white mt-1">12</h3>
+                            <span class="text-xs text-indigo-400 mt-2 inline-flex items-center gap-1"><i class="fa-solid fa-check"></i> ទំនេរ 3 បន្ទប់</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-door-closed"></i>
+                        </div>
+                    </div>
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">សិស្សចុះឈ្មោះ</p>
+                            <h3 class="text-2xl font-bold text-white mt-1">530</h3>
+                            <span class="text-xs text-emerald-400 mt-2 inline-flex items-center gap-1"><i class="fa-solid fa-user-plus"></i> សកម្ម</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent System Activities -->
+                <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-indigo-400"></i> សកម្មភាពប្រព័ន្ធថ្មីៗ
+                    </h3>
+                    <div class="space-y-3" id="home-activity-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 2: BOOK BORROWING (ការខ្ចីសៀវភៅ) ================= -->
+            <div id="view-borrow" class="view-section hidden space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">បញ្ជីការខ្ចី-សងសៀវភៅ</h3>
+                        <p class="text-xs text-gray-400 mt-1">គ្រប់គ្រងការខ្ចីសៀវភៅរបស់សិស្សានុសិស្សក្នុងបណ្ណាល័យ</p>
+                    </div>
+                    <button onclick="openBorrowModal()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-plus"></i> បន្ថែមការខ្ចីថ្មី
+                    </button>
+                </div>
+
+                <!-- Borrowing Table -->
+                <div class="bg-cardbg border border-cardborder rounded-2xl shadow-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#1f242d] border-b border-cardborder text-xs text-gray-400 uppercase tracking-wider">
+                                    <th class="p-4">កូដសៀវភៅ</th>
+                                    <th class="p-4">ឈ្មោះសៀវភៅ</th>
+                                    <th class="p-4">ឈ្មោះសិស្ស</th>
+                                    <th class="p-4">កាលបរិច្ឆេទខ្ចី</th>
+                                    <th class="p-4">ស្ថានភាព</th>
+                                    <th class="p-4 text-right">សកម្មភាព</th>
+                                </tr>
+                            </thead>
+                            <tbody id="borrow-table-body" class="divide-y divide-cardborder text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 3: STUDY ROOMS (ការកក់បន្ទប់សិក្សា) ================= -->
+            <div id="view-rooms" class="view-section hidden space-y-6">
+                <!-- Status Legend Card -->
+                <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-base font-semibold mb-4 text-gray-200">ផែនទីបន្ទប់ផ្ទាល់ (Room Status Legend)</h3>
+                    <div class="flex flex-wrap gap-6 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3.5 h-3.5 bg-emerald-500 rounded-full shadow-md shadow-emerald-500/50"></span>
+                            <span class="text-gray-300">ទំនេរ (Available)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3.5 h-3.5 bg-amber-400 rounded-full shadow-md shadow-amber-400/50"></span>
+                            <span class="text-gray-300">បានកក់ (Reserved)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3.5 h-3.5 bg-rose-500 rounded-full shadow-md shadow-rose-500/50"></span>
+                            <span class="text-gray-300">កំពុងប្រើប្រាស់ (Occupied)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">បន្ទប់សរុប</p>
+                            <h3 class="text-3xl font-bold text-white">12</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center text-amber-400 text-xl font-bold">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                    </div>
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-1">អត្រាប្រើប្រាស់</p>
+                            <h3 class="text-3xl font-bold text-white">78%</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400 text-xl font-bold">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12 Interactive Rooms Grid -->
+                <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4 text-white">ជ្រើសរើសបន្ទប់ដើម្បីគ្រប់គ្រង</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="rooms-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 4: SYSTEM AUDIT CHECK (ប្រព័ន្ធពិនិត្យ) ================= -->
+            <div id="view-audit" class="view-section hidden space-y-6">
+                <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">ការពិនិត្យសុខភាពប្រព័ន្ធ និង Audit Logs</h3>
+                        <p class="text-xs text-gray-400 mt-1">ពិនិត្យសន្តិសុខ ប្រតិបត្តិការ និងកំណត់ត្រាប្រព័ន្ធបណ្ណាល័យ</p>
+                    </div>
+                    <button onclick="runSystemCheck()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-stethoscope"></i> ចាប់ផ្តើមពិនិត្យ
+                    </button>
+                </div>
+
+                <!-- System Health Status Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-white">Database Status</h4>
+                            <span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-medium">មានស្ថេរភាព</span>
+                        </div>
+                        <p class="text-2xl font-bold text-white">99.98%</p>
+                        <p class="text-xs text-gray-400 mt-2">Latency: 14ms</p>
+                    </div>
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-white">API Services</h4>
+                            <span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-medium">ដំណើរការល្អ</span>
+                        </div>
+                        <p class="text-2xl font-bold text-white">Online</p>
+                        <p class="text-xs text-gray-400 mt-2">All endpoints responding</p>
+                    </div>
+                    <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-white">Security Audits</h4>
+                            <span class="px-2.5 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-lg text-xs font-medium">គ្មានបញ្ហា</span>
+                        </div>
+                        <p class="text-2xl font-bold text-white">0 Threats</p>
+                        <p class="text-xs text-gray-400 mt-2">Last scan: Today</p>
+                    </div>
+                </div>
+
+                <!-- Audit Logs Table -->
+                <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-base font-semibold mb-4 text-white">កំណត់ត្រាសុវត្ថិភាព (Audit Logs)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#1f242d] border-b border-cardborder text-xs text-gray-400 uppercase">
+                                    <th class="p-3">ពេលវាលា</th>
+                                    <th class="p-3">សកម្មភាព</th>
+                                    <th class="p-3">អ្នកប្រើប្រាស់</th>
+                                    <th class="p-3">កម្រិត</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-cardborder text-sm" id="audit-logs-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Custom Modal for adding/editing items -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-cardborder w-full max-w-md rounded-2xl p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <h3 id="modal-title" class="text-lg font-bold text-white mb-4">បញ្ចូលព័ត៌មាន</h3>
+            <form id="modal-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <div id="modal-fields">
+                    <!-- Dynamic fields -->
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-sm transition">បោះបង់</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition">រក្សាទុក</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-[#1f242d] border border-cardborder text-white px-5 py-3 rounded-xl shadow-2xl z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg" class="text-sm font-medium">ប្រតិបត្តិការជោគជ័យ!</span>
+    </div>
+
+    <script>
+        // Initial Application State Data
+        let appState = {
+            currentTab: 'home',
+            borrowings: [
+                { id: 1, code: 'BK-001', title: 'គណិតវិទ្យាជាន់ខ្ពស់', student: 'សុខ សុភា', date: '2026-10-01', status: 'borrowed' },
+                { id: 2, code: 'BK-002', title: 'រូបវិទ្យាមូលដ្ឋាន', student: 'ចាន់ ដារ៉ា', date: '2026-09-28', status: 'returned' },
+                { id: 3, code: 'BK-003', title: 'ប្រវត្តិវិទ្យាពិភពលោក', student: 'កែវ ពិសិដ្ឋ', date: '2026-10-04', status: 'borrowed' }
+            ],
+            rooms: [
+                { id: 1, name: 'Room 101', status: 'available', user: null },
+                { id: 2, name: 'Room 102', status: 'reserved', user: 'Dara' },
+                { id: 3, name: 'Room 103', status: 'occupied', user: 'Sophea' },
+                { id: 4, name: 'Room 104', status: 'available', user: null },
+                
+            ],
+            auditLogs: [
+                { time: '14:20:10', action: 'Admin logged in', user: 'Administrator', level: 'INFO' },
+                { time: '13:59:02', action: 'Room 101 booked', user: 'Dara', level: 'SUCCESS' },
+                { time: '12:15:44', action: 'New book added: BK-004', user: 'Librarian', level: 'INFO' },
+                { time: '10:05:12', action: 'System health check completed', user: 'System', level: 'SUCCESS' }
+            ]
+        };
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            appState.currentTab = tabId;
+            
+            // Hide all sections
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+            // Update Sidebar Active States
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            activeBtn.classList.remove('text-gray-400');
+            activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/30');
+
+            // Update Header Title
+            const titles = {
+                home: '<i class="fa-solid fa-house-chimney text-indigo-400"></i> ទំព័រដើម (Home Dashboard)',
+                borrow: '<i class="fa-solid fa-book-bookmark text-indigo-400"></i> ការខ្ចីសៀវភៅ (Book Borrowing)',
+                rooms: '<i class="fa-solid fa-door-open text-indigo-400"></i> ការកក់បន្ទប់សិក្សា (Study Room Management)',
+                audit: '<i class="fa-solid fa-shield-halved text-indigo-400"></i> ប្រព័ន្ធពិនិត្យសុខភាពប្រព័ន្ធ (System Audit)'
+            };
+            document.getElementById('header-title').innerHTML = titles[tabId];
+
+            // Render view-specific content
+            renderCurrentView();
+        }
+
+        function renderCurrentView() {
+            if (appState.currentTab === 'home') renderHome();
+            if (appState.currentTab === 'borrow') renderBorrowTable();
+            if (appState.currentTab === 'rooms') renderRoomsGrid();
+            if (appState.currentTab === 'audit') renderAuditLogs();
+        }
+
+        // Render Home Activities
+        function renderHome() {
+            const list = document.getElementById('home-activity-list');
+            list.innerHTML = appState.auditLogs.slice(0, 4).map(log => `
+                <div class="flex justify-between items-center p-3.5 bg-[#11161d] rounded-xl border border-cardborder text-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <span class="text-gray-300 font-medium">${log.action}</span>
+                    </div>
+                    <span class="text-gray-500 text-xs">${log.time}</span>
+                </div>
+            `).join('');
+        }
+
+        // Render Borrowing Table
+        function renderBorrowTable() {
+            const tbody = document.getElementById('borrow-table-body');
+            tbody.innerHTML = appState.borrowings.map(item => `
+                <tr class="hover:bg-[#1f242d]/50 transition">
+                    <td class="p-4 font-mono text-indigo-400 font-semibold">${item.code}</td>
+                    <td class="p-4 font-medium text-white">${item.title}</td>
+                    <td class="p-4 text-gray-300">${item.student}</td>
+                    <td class="p-4 text-gray-400">${item.date}</td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${item.status === 'borrowed' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+                            ${item.status === 'borrowed' ? 'កំពុងខ្ចី' : 'បានសងរួច'}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right">
+                        ${item.status === 'borrowed' ? `<button onclick="returnBook(${item.id})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium transition shadow">ទទួលសង</button>` : '<span class="text-xs text-gray-500">-</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Rooms Grid
+        function renderRoomsGrid() {
+            const grid = document.getElementById('rooms-grid');
+            grid.innerHTML = appState.rooms.map(room => {
+                let statusColor = room.status === 'available' ? 'border-emerald-500/40 bg-emerald-500/5 text-emerald-400' :
+                                  room.status === 'reserved' ? 'border-amber-500/40 bg-amber-500/5 text-amber-400' :
+                                  'border-rose-500/40 bg-rose-500/5 text-rose-400';
+                let dotColor = room.status === 'available' ? 'bg-emerald-500' : room.status === 'reserved' ? 'bg-amber-400' : 'bg-rose-500';
+                let statusText = room.status === 'available' ? 'ទំនេរ' : room.status === 'reserved' ? 'បានកក់' : 'កំពុងប្រើ';
+
+                return `
+                    <div onclick="toggleRoomStatus(${room.id})" class="bg-[#11161d] border ${statusColor} p-4 rounded-2xl cursor-pointer hover:scale-105 transition-all shadow-md flex flex-col justify-between h-32">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-white text-base">${room.name}</span>
+                            <span class="w-2.5 h-2.5 rounded-full ${dotColor} shadow-sm shadow-${dotColor}"></span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold">${statusText}</p>
+                            <p class="text-xs text-gray-400 truncate mt-1">${room.user ? 'User: ' + room.user : 'គ្មានអ្នកប្រើ'}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Audit Logs
+        function renderAuditLogs() {
+            const tbody = document.getElementById('audit-logs-body');
+            tbody.innerHTML = appState.auditLogs.map(log => `
+                <tr class="hover:bg-[#1f242d]/50 transition">
+                    <td class="p-3 font-mono text-gray-400">${log.time}</td>
+                    <td class="p-3 font-medium text-white">${log.action}</td>
+                    <td class="p-3 text-gray-300">${log.user}</td>
+                    <td class="p-3">
+                        <span class="px-2.5 py-0.5 rounded text-xs font-semibold ${log.level === 'SUCCESS' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400'}">
+                            ${log.level}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Room interactive toggle
+        function toggleRoomStatus(roomId) {
+            const room = appState.rooms.find(r => r.id === roomId);
+            if (room.status === 'available') {
+                room.status = 'reserved';
+                room.user = 'Guest Student';
+            } else if (room.status === 'reserved') {
+                room.status = 'occupied';
+            } else {
+                room.status = 'available';
+                room.user = null;
+            }
+            renderRoomsGrid();
+            showToast(`បានប្តូរស្ថានភាព ${room.name} ជោគជ័យ!`);
+        }
+
+        // Return book action
+        function returnBook(id) {
+            const book = appState.borrowings.find(b => b.id === id);
+            book.status = 'returned';
+            renderBorrowTable();
+            showToast(`សៀវភៅ ${book.title} ត្រូវបានកត់ត្រាថាបានសងរួច!`);
+        }
+
+        // Modal Controls
+        function openBorrowModal() {
+            document.getElementById('modal-title').innerText = 'បន្ថែមការខ្ចីសៀវភៅថ្មី';
+            document.getElementById('modal-fields').innerHTML = `
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">កូដសៀវភៅ</label>
+                    <input type="text" id="b-code" required class="w-full bg-[#11161d] border border-cardborder rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500" placeholder="ឧ. BK-004">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">ចំណងជើងសៀវភៅ</label>
+                    <input type="text" id="b-title" required class="w-full bg-[#11161d] border border-cardborder rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500" placeholder="បញ្ចូលឈ្មោះសៀវភៅ">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">ឈ្មោះសិស្ស</label>
+                    <input type="text" id="b-student" required class="w-full bg-[#11161d] border border-cardborder rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500" placeholder="បញ្ចូលឈ្មោះសិស្ស">
+                </div>
+            `;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const code = document.getElementById('b-code').value;
+            const title = document.getElementById('b-title').value;
+            const student = document.getElementById('b-student').value;
+
+            appState.borrowings.unshift({
+                id: Date.now(),
+                code,
+                title,
+                student,
+                date: new Date().toISOString().split('T')[0],
+                status: 'borrowed'
+            });
+
+            closeModal();
+            renderBorrowTable();
+            showToast('បានបង្កើតការខ្ចីថ្មីដោយជោគជ័យ!');
+        }
+
+        // Toast notification helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // Refresh simulation
+        function refreshData() {
+            showToast('ទិន្នន័យត្រូវបានផ្ទុកជាថ្មី (Refreshed)!');
+            renderCurrentView();
+        }
+
+        function runSystemCheck() {
+            showToast('ការពិនិត្យសុខភាពប្រព័ន្ធបានបញ្ចប់ដោយសុវត្ថិភាព!');
+            appState.auditLogs.unshift({
+                time: new Date().toTimeString().split(' ')[0],
+                action: 'Manual System Health Audit',
+                user: 'Administrator',
+                level: 'SUCCESS'
+            });
+            renderAuditLogs();
+        }
+
+        // Initial Load on Window Load
+        window.onload = function() {
+            switchTab('home');
+        };
+    </script>
+</body>
+</html>
