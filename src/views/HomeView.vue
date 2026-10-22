@@ -1,47 +1,75 @@
-```vue
+
 <template>
   <section class="user-home" v-translate="locale">
-    <!-- Welcome header -->
+    <!-- Header -->
     <header class="welcome-header">
-      <div>
-        <span class="eyebrow">🌿 LEAFLINE LIBRARY</span>
-        <h1>សួស្តី, <em>{{ profile.fullName || 'និស្សិត' }}</em> 👋</h1>
+      <div class="welcome-copy">
+        <span class="eyebrow">
+          <span class="brand-leaf">🌿</span> LIBRARY
+        </span>
+
+        <h1>
+          សួស្តី, <em>{{ profile.fullName || 'និស្សិត' }}</em> 👋
+        </h1>
+
         <p>ត្រៀមខ្លួនសម្រាប់ថ្ងៃសិក្សាដ៏ល្អមួយហើយឬនៅ?</p>
       </div>
 
-      <button class="profile-button" @click="openProfile">
-        <img v-if="profile.avatar" :src="profile.avatar" alt="រូប Profile" />
+      <button
+        class="profile-button"
+        type="button"
+        @click="openProfile"
+        aria-label="កែប្រែគណនីរបស់ខ្ញុំ"
+      >
+        <img
+          v-if="profile.avatar"
+          :src="profile.avatar"
+          alt="រូប Profile"
+        />
         <span v-else class="avatar-placeholder">
           {{ initials }}
         </span>
+
         <span class="profile-button-text">
           <strong>គណនីរបស់ខ្ញុំ</strong>
           <small>កែប្រែ Profile</small>
         </span>
+
         <UserRound :size="18" />
       </button>
     </header>
 
-    <!-- Main actions -->
-    <div class="hero-card">
+    <!-- Hero -->
+    <section class="hero-card">
       <div class="hero-copy">
         <span class="hero-label">
-          <Sparkles :size="16" /> YOUR STUDY SPACE
+          <Sparkles :size="16" />
+          YOUR STUDY SPACE
         </span>
+
         <h2>រៀនដោយរីករាយ<br />រីកចម្រើនរាល់ថ្ងៃ។</h2>
+
         <p>
           ស្វែងរកសៀវភៅដែលអ្នកចូលចិត្ត
           ឬកក់បន្ទប់ស្ងប់ស្ងាត់សម្រាប់ការសិក្សា។
         </p>
 
         <div class="hero-actions">
-          <button class="btn-primary" @click="$emit('navigate', 'catalog')">
+          <button
+            class="btn-primary"
+            type="button"
+            @click="$emit('navigate', 'catalog')"
+          >
             <BookOpen :size="20" />
             រកសៀវភៅ
             <ArrowRight :size="18" />
           </button>
 
-          <button class="btn-secondary" @click="$emit('navigate', 'rooms')">
+          <button
+            class="btn-secondary"
+            type="button"
+            @click="$emit('navigate', 'rooms')"
+          >
             <CalendarDays :size="20" />
             កក់បន្ទប់
           </button>
@@ -50,24 +78,29 @@
 
       <div class="hero-decoration" aria-hidden="true">
         <div class="decoration-circle">
-          <BookOpen :size="92" stroke-width="1.3" />
+          <BookOpen :size="88" stroke-width="1.3" />
         </div>
         <span class="deco-star star-one">✦</span>
         <span class="deco-star star-two">✿</span>
         <span class="deco-leaf">🌱</span>
       </div>
-    </div>
+    </section>
 
-    <!-- Only essential services -->
+    <!-- Services -->
     <div class="section-heading">
       <div>
-        <h2>សេវាកម្មរបស់អ្នក</h2>
+        <span class="section-kicker">EXPLORE LIBRARY</span>
+        <h2>សេវាកម្មរបស់អ្នក ✨</h2>
         <p>ជ្រើសរើសអ្វីដែលអ្នកចង់ធ្វើថ្ងៃនេះ</p>
       </div>
     </div>
 
     <div class="service-grid">
-      <button class="service-card" @click="$emit('navigate', 'catalog')">
+      <button
+        class="service-card"
+        type="button"
+        @click="$emit('navigate', 'catalog')"
+      >
         <span class="service-icon mint">
           <BookOpen :size="27" />
         </span>
@@ -78,7 +111,11 @@
         <ArrowRight class="service-arrow" :size="19" />
       </button>
 
-      <button class="service-card" @click="$emit('navigate', 'rooms')">
+      <button
+        class="service-card"
+        type="button"
+        @click="$emit('navigate', 'rooms')"
+      >
         <span class="service-icon lavender">
           <CalendarDays :size="27" />
         </span>
@@ -89,7 +126,11 @@
         <ArrowRight class="service-arrow" :size="19" />
       </button>
 
-      <button class="service-card" @click="$emit('navigate', 'loans')">
+      <button
+        class="service-card"
+        type="button"
+        @click="$emit('navigate', 'loans')"
+      >
         <span class="service-icon peach">
           <LibraryBig :size="27" />
         </span>
@@ -100,7 +141,11 @@
         <ArrowRight class="service-arrow" :size="19" />
       </button>
 
-      <button class="service-card" @click="$emit('navigate', 'cart')">
+      <button
+        class="service-card"
+        type="button"
+        @click="$emit('navigate', 'cart')"
+      >
         <span class="service-icon sky">
           <ShoppingCart :size="27" />
         </span>
@@ -112,98 +157,154 @@
       </button>
     </div>
 
-    <!-- Profile editor -->
-    <div v-if="profileOpen" class="modal-backdrop" @click.self="closeProfile">
-      <section
-        class="profile-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="profile-title"
+    <!-- Profile modal -->
+    <Teleport to="body">
+      <div
+        v-if="profileOpen"
+        class="modal-backdrop"
+        @click.self="closeProfile"
       >
-        <header class="modal-header">
-          <div>
-            <span class="eyebrow">✨ MY ACCOUNT</span>
-            <h2 id="profile-title">កែប្រែ Profile</h2>
-            <p>កែប្រែព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នក</p>
-          </div>
-          <button
-            class="close-button"
-            type="button"
-            aria-label="បិទ"
-            @click="closeProfile"
-          >×</button>
-        </header>
-
-        <form class="profile-form" @submit.prevent="saveProfile">
-          <div class="avatar-editor">
-            <div class="large-avatar">
-              <img v-if="draft.avatar" :src="draft.avatar" alt="រូប Profile" />
-              <span v-else>{{ draftInitials }}</span>
+        <section
+          class="profile-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="profile-title"
+        >
+          <header class="modal-header">
+            <div>
+              <span class="eyebrow">✨ MY ACCOUNT</span>
+              <h2 id="profile-title">កែប្រែ Profile</h2>
+              <p>ធ្វើបច្ចុប្បន្នភាពព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នក</p>
             </div>
-            <div class="avatar-actions">
-              <label class="upload-button">
-                <Camera :size="17" />
-                ប្តូររូបភាព
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  @change="changeAvatar"
+
+            <button
+              class="close-button"
+              type="button"
+              aria-label="បិទ"
+              @click="closeProfile"
+            >
+              ×
+            </button>
+          </header>
+
+          <form class="profile-form" @submit.prevent="saveProfile">
+            <!-- Avatar -->
+            <div class="avatar-editor">
+              <div class="large-avatar">
+                <img
+                  v-if="draft.avatar"
+                  :src="draft.avatar"
+                  alt="រូប Profile ថ្មី"
                 />
-              </label>
-              <button
-                v-if="draft.avatar"
-                class="remove-avatar"
-                type="button"
-                @click="draft.avatar = ''"
-              >
-                លុបរូបភាព
-              </button>
-              <small>PNG, JPG ឬ WEBP</small>
+                <span v-else>{{ draftInitials }}</span>
+              </div>
+
+              <div class="avatar-actions">
+                <label class="upload-button">
+                  <Camera :size="17" />
+                  ប្តូររូបភាព
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    @change="changeAvatar"
+                  />
+                </label>
+
+                <button
+                  v-if="draft.avatar"
+                  class="remove-avatar"
+                  type="button"
+                  @click="removeAvatar"
+                >
+                  <Trash2 :size="15" />
+                  លុបរូប
+                </button>
+
+                <small>PNG, JPG ឬ WEBP · អតិបរមា 2MB</small>
+              </div>
             </div>
-          </div>
 
-          <label class="form-field">
-            ឈ្មោះពេញ
-            <input v-model.trim="draft.fullName" required minlength="2" />
-          </label>
+            <label class="form-field">
+              ឈ្មោះពេញ
+              <input
+                v-model.trim="draft.fullName"
+                type="text"
+                required
+                minlength="2"
+                maxlength="100"
+                placeholder="បញ្ចូលឈ្មោះរបស់អ្នក"
+              />
+            </label>
 
-          <label class="form-field">
-            អ៊ីមែល
-            <input v-model.trim="draft.email" type="email" required />
-          </label>
+            <label class="form-field">
+              អ៊ីមែល
+              <input
+                v-model.trim="draft.email"
+                type="email"
+                required
+                maxlength="150"
+                placeholder="example@email.com"
+              />
+            </label>
 
-          <label class="form-field">
-            លេខទូរស័ព្ទ
-            <input v-model.trim="draft.phone" type="tel" placeholder="0xx xxx xxx" />
-          </label>
+            <label class="form-field">
+              លេខទូរស័ព្ទ
+              <input
+                v-model.trim="draft.phone"
+                type="tel"
+                maxlength="30"
+                placeholder="0xx xxx xxx"
+              />
+            </label>
 
-          <label class="form-field">
-            លេខសម្គាល់និស្សិត
-            <input :value="draft.studentId" disabled />
-            <small>លេខសម្គាល់នេះមិនអាចកែពីទីនេះបានទេ។</small>
-          </label>
+            <label class="form-field">
+              លេខសម្គាល់និស្សិត
+              <input :value="draft.studentId || 'មិនទាន់មាន'" disabled />
+              <small>លេខសម្គាល់នេះមិនអាចកែប្រែពីទីនេះបានទេ។</small>
+            </label>
 
-          <p v-if="profileError" class="profile-error" role="alert">
-            {{ profileError }}
-          </p>
+            <p
+              v-if="profileError"
+              class="profile-error"
+              role="alert"
+            >
+              {{ profileError }}
+            </p>
 
-          <div class="modal-actions">
-            <button type="button" class="cancel-button" @click="closeProfile">
-              បោះបង់
-            </button>
-            <button type="submit" class="save-button">
-              <Check :size="18" />
-              រក្សាទុក
-            </button>
-          </div>
-        </form>
-      </section>
-    </div>
+            <p v-if="profileSuccess" class="profile-success" role="status">
+              {{ profileSuccess }}
+            </p>
+
+            <div class="modal-actions">
+              <button
+                type="button"
+                class="cancel-button"
+                @click="closeProfile"
+              >
+                បោះបង់
+              </button>
+
+              <button type="submit" class="save-button" :disabled="saving">
+                <Check :size="18" />
+                {{ saving ? 'កំពុងរក្សាទុក...' : 'រក្សាទុក' }}
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </Teleport>
   </section>
 </template>
 
 <script setup>
-import { computed, inject, reactive, ref, watch } from 'vue';
+import {
+  computed,
+  inject,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
+
 import {
   ArrowRight,
   BookOpen,
@@ -213,6 +314,7 @@ import {
   LibraryBig,
   ShoppingCart,
   Sparkles,
+  Trash2,
   UserRound,
 } from '@lucide/vue';
 
@@ -223,6 +325,8 @@ const locale = inject('locale', ref('km'));
 
 const profileOpen = ref(false);
 const profileError = ref('');
+const profileSuccess = ref('');
+const saving = ref(false);
 
 const profile = reactive({
   fullName: '',
@@ -240,20 +344,43 @@ const draft = reactive({
   avatar: '',
 });
 
+function readSavedProfile() {
+  try {
+    const raw = localStorage.getItem('leafline_student');
+    return raw ? JSON.parse(raw) : {};
+  } catch (error) {
+    console.error('Unable to read saved profile:', error);
+    return {};
+  }
+}
+
+function getInjectedProfile() {
+  if (!studentProfile) return {};
+
+  // Supports both a Vue ref and a reactive injected object.
+  const value =
+    'value' in Object(studentProfile)
+      ? studentProfile.value
+      : studentProfile;
+
+  return value && typeof value === 'object' ? value : {};
+}
+
 function syncProfile() {
-  const saved = studentProfile?.value || {};
+  const saved = readSavedProfile();
+  const injected = getInjectedProfile();
 
   Object.assign(profile, {
-    fullName: saved.fullName || '',
-    email: saved.email || '',
-    phone: saved.phone || '',
-    studentId: saved.studentId || '',
-    avatar: saved.avatar || '',
+    fullName: injected.fullName || saved.fullName || '',
+    email: injected.email || saved.email || '',
+    phone: injected.phone || saved.phone || '',
+    studentId: injected.studentId || saved.studentId || '',
+    avatar: injected.avatar || saved.avatar || '',
   });
 }
 
 watch(
-  () => studentProfile?.value,
+  () => studentProfile,
   syncProfile,
   { immediate: true, deep: true },
 );
@@ -262,32 +389,52 @@ const initials = computed(() => getInitials(profile.fullName));
 const draftInitials = computed(() => getInitials(draft.fullName));
 
 function getInitials(name) {
-  return String(name || 'និស្សិត')
-    .trim()
-    .split(/\s+/)
+  const parts = String(name || 'និស្សិត').trim().split(/\s+/);
+  return parts
     .slice(0, 2)
-    .map((part) => [...part][0])
+    .map((part) => [...part][0] || '')
     .join('');
 }
 
 function openProfile() {
   Object.assign(draft, profile);
   profileError.value = '';
+  profileSuccess.value = '';
   profileOpen.value = true;
 }
 
 function closeProfile() {
   profileOpen.value = false;
   profileError.value = '';
+  profileSuccess.value = '';
+}
+
+function removeAvatar() {
+  draft.avatar = '';
+  profileError.value = '';
 }
 
 function changeAvatar(event) {
-  const file = event.target.files?.[0];
+  const input = event.target;
+  const file = input.files?.[0];
+
   if (!file) return;
 
+  const allowedTypes = [
+    'image/png',
+    'image/jpeg',
+    'image/webp',
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    profileError.value = 'សូមប្រើរូបភាព PNG, JPG ឬ WEBP។';
+    input.value = '';
+    return;
+  }
+
   if (file.size > 2 * 1024 * 1024) {
-    profileError.value = 'សូមជ្រើសរើសរូបភាពទំហំមិនលើស 2MB។';
-    event.target.value = '';
+    profileError.value = 'សូមជ្រើសរើសរូបភាពដែលមានទំហំមិនលើស 2MB។';
+    input.value = '';
     return;
   }
 
@@ -297,6 +444,7 @@ function changeAvatar(event) {
     if (typeof reader.result === 'string') {
       draft.avatar = reader.result;
       profileError.value = '';
+      profileSuccess.value = '';
     }
   };
 
@@ -305,40 +453,70 @@ function changeAvatar(event) {
   };
 
   reader.readAsDataURL(file);
-  event.target.value = '';
+  input.value = '';
 }
 
 function saveProfile() {
+  if (saving.value) return;
+
   profileError.value = '';
+  profileSuccess.value = '';
+
+  const fullName = draft.fullName.trim();
+  const email = draft.email.trim();
+  const phone = draft.phone.trim();
+
+  if (fullName.length < 2) {
+    profileError.value = 'សូមបញ្ចូលឈ្មោះយ៉ាងតិច 2 តួអក្សរ។';
+    return;
+  }
+
+  if (!email) {
+    profileError.value = 'សូមបញ្ចូលអ៊ីមែលរបស់អ្នក។';
+    return;
+  }
 
   const updated = {
     ...profile,
-    fullName: draft.fullName.trim(),
-    email: draft.email.trim(),
-    phone: draft.phone.trim(),
+    fullName,
+    email,
+    phone,
     avatar: draft.avatar,
   };
 
+  saving.value = true;
+
   try {
-    const previous = JSON.parse(
-      localStorage.getItem('leafline_student') || '{}',
-    );
+    const previous = readSavedProfile();
 
-    const next = { ...previous, ...updated };
+    const next = {
+      ...previous,
+      ...updated,
+      // Keep the original student ID unchanged.
+      studentId: profile.studentId || previous.studentId || '',
+    };
 
-    // Ensure the profile is saved before updating the UI.
     localStorage.setItem('leafline_student', JSON.stringify(next));
 
-    if (studentProfile?.value) {
-      Object.assign(studentProfile.value, next);
+    // Update the injected profile when the parent provides one.
+    if (studentProfile) {
+      const injected = getInjectedProfile();
+
+      if (injected && typeof injected === 'object') {
+        Object.assign(injected, next);
+      }
     }
 
-    Object.assign(profile, updated);
+    Object.assign(profile, next);
+    Object.assign(draft, next);
+
     closeProfile();
   } catch (error) {
     console.error('Unable to save profile:', error);
     profileError.value =
-      'មិនអាចរក្សាទុកព័ត៌មានបានទេ។ សូមសាកល្បងរូបភាពតូចជាងនេះ។';
+      'មិនអាចរក្សាទុកព័ត៌មានបានទេ។ រូបភាពអាចធំពេក សូមប្រើរូបភាពតូចជាងនេះ។';
+  } finally {
+    saving.value = false;
   }
 }
 </script>
@@ -350,8 +528,9 @@ function saveProfile() {
   --ink: #263b30;
   --muted: #7a897f;
   --line: #e6eee7;
+
   width: 100%;
-  padding: 8px 0 28px;
+  padding: 10px 0 32px;
   color: var(--ink);
   font-family: "Noto Sans Khmer", "Khmer OS Battambang", system-ui, sans-serif;
 }
@@ -371,12 +550,18 @@ function saveProfile() {
 }
 
 .eyebrow {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   margin-bottom: 9px;
   color: var(--green);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 1.1px;
+}
+
+.brand-leaf {
+  font-size: 17px;
 }
 
 .welcome-header h1 {
@@ -390,6 +575,7 @@ function saveProfile() {
 .welcome-header h1 em {
   color: var(--green);
   font-style: normal;
+  overflow-wrap: anywhere;
 }
 
 .welcome-header p,
@@ -403,6 +589,7 @@ function saveProfile() {
 
 .profile-button {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 11px;
   padding: 9px 13px 9px 9px;
@@ -601,13 +788,22 @@ function saveProfile() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 30px 0 16px;
+  margin: 32px 0 16px;
+}
+
+.section-kicker {
+  display: block;
+  margin-bottom: 5px;
+  color: #80a18a;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
 }
 
 .section-heading h2 {
   margin: 0;
   color: #2c4434;
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 900;
 }
 
@@ -646,10 +842,25 @@ function saveProfile() {
   border-radius: 16px;
 }
 
-.mint { background: #e0f7e8; color: #27845b; }
-.lavender { background: #f0e8ff; color: #8960ce; }
-.peach { background: #fff0e5; color: #d7824c; }
-.sky { background: #e4f2ff; color: #4287c9; }
+.mint {
+  background: #e0f7e8;
+  color: #27845b;
+}
+
+.lavender {
+  background: #f0e8ff;
+  color: #8960ce;
+}
+
+.peach {
+  background: #fff0e5;
+  color: #d7824c;
+}
+
+.sky {
+  background: #e4f2ff;
+  color: #4287c9;
+}
 
 .service-text {
   display: grid;
@@ -681,10 +892,10 @@ function saveProfile() {
   transform: translateX(4px);
 }
 
-/* Profile editor */
+/* Profile modal */
 .modal-backdrop {
   position: fixed;
-  z-index: 1000;
+  z-index: 9999;
   inset: 0;
   display: grid;
   place-items: center;
@@ -703,6 +914,18 @@ function saveProfile() {
   border-radius: 25px;
   background: #fff;
   box-shadow: 0 24px 80px #12271c35;
+  animation: modal-enter .2s ease-out;
+}
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-header {
@@ -729,6 +952,11 @@ function saveProfile() {
   color: #627268;
   font-size: 25px;
   cursor: pointer;
+}
+
+.close-button:hover {
+  background: #eaf6ed;
+  color: var(--green-dark);
 }
 
 .avatar-editor {
@@ -787,6 +1015,10 @@ function saveProfile() {
   cursor: pointer;
 }
 
+.upload-button:hover {
+  background: #edf8ef;
+}
+
 .upload-button input {
   display: none;
 }
@@ -794,6 +1026,10 @@ function saveProfile() {
 .remove-avatar {
   border-color: #f0dada;
   color: #b54d4d;
+}
+
+.remove-avatar:hover {
+  background: #fff4f4;
 }
 
 .avatar-actions small {
@@ -826,6 +1062,7 @@ function saveProfile() {
   font: inherit;
   font-size: 13px;
   outline: none;
+  transition: .2s ease;
 }
 
 .form-field input:focus {
@@ -845,14 +1082,23 @@ function saveProfile() {
   font-weight: 500;
 }
 
-.profile-error {
+.profile-error,
+.profile-success {
   margin: 0;
   padding: 11px;
   border-radius: 10px;
-  background: #fff0f0;
-  color: #b33d3d;
   font-size: 12px;
   line-height: 1.7;
+}
+
+.profile-error {
+  background: #fff0f0;
+  color: #b33d3d;
+}
+
+.profile-success {
+  background: #eaf8ee;
+  color: #237849;
 }
 
 .modal-actions {
@@ -875,6 +1121,7 @@ function saveProfile() {
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
+  transition: .2s ease;
 }
 
 .cancel-button {
@@ -883,10 +1130,24 @@ function saveProfile() {
   color: #68776d;
 }
 
+.cancel-button:hover {
+  background: #f5f8f5;
+}
+
 .save-button {
   border: 1px solid var(--green);
-  background: var(--green);
+  background: linear-gradient(135deg, #329b68, #19774e);
   color: #fff;
+}
+
+.save-button:hover:not(:disabled) {
+  box-shadow: 0 5px 14px #27845b30;
+  transform: translateY(-1px);
+}
+
+.save-button:disabled {
+  cursor: wait;
+  opacity: .65;
 }
 
 .user-home button:focus-visible,
@@ -1007,4 +1268,3 @@ function saveProfile() {
   }
 }
 </style>
-```

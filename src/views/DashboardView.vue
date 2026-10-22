@@ -1,1874 +1,505 @@
-
 <template>
-  <main class="dashboard" v-translate="locale" :data-locale="locale">
-    <!-- Welcome Header -->
-    <header class="welcome-card">
-      <div class="welcome-content">
-        <span class="welcome-label">
-          <span class="sparkle">✦</span>
-          បណ្ណាល័យឌីជីថល
-        </span>
-
-        <h1>សួស្ដី! រីករាយថ្ងៃសិក្សា <span>🌷</span></h1>
-
-        <p>
-          ចាប់ផ្ដើមថ្ងៃថ្មីជាមួយសៀវភៅល្អៗ និងកន្លែងសិក្សាដែលអ្នកចូលចិត្ត។
-        </p>
-
-        <div class="welcome-actions">
-          <button class="primary-btn" @click="navigateTo('catalog')">
-            <span>📚</span>
-            ខ្ចីសៀវភៅ
-            <span class="arrow">→</span>
+  <main class="home-page" v-translate="locale" :data-locale="locale">
+    <!-- Hero: user-facing only -->
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="eyebrow-dot"></span> LEAFLINE DIGITAL LIBRARY</span>
+        <h1>សួស្ដី{{ userName ? ` ${userName}` : '' }}! <span class="wave">👋</span></h1>
+        <p class="hero-subtitle">រីករាយដែលបានជួបអ្នកម្ដងទៀត។ ថ្ងៃនេះតោះមកស្វែងរកសៀវភៅល្អៗ និងបង្កើនចំណេះដឹងជាមួយគ្នា។</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" @click="navigateTo('catalog')">
+            <BookOpen :size="18" /> ស្វែងរកសៀវភៅ <ArrowRight :size="17" />
           </button>
-
-          <button class="secondary-btn" @click="navigateTo('rooms')">
-            <span>🪑</span>
-            កក់បន្ទប់សិក្សា
+          <button class="btn btn-soft" @click="navigateTo('loans')">
+            <BookmarkCheck :size="18" /> សៀវភៅរបស់ខ្ញុំ
           </button>
         </div>
+        <div class="hero-note"><Sparkles :size="16" /> អានតិចៗរាល់ថ្ងៃ ចំណេះដឹងកើនឡើងរាល់ថ្ងៃ!</div>
       </div>
 
-      <div class="welcome-illustration" aria-hidden="true">
-        <div class="illustration-circle">
-          <span class="book book-one">📘</span>
-          <span class="book book-two">📗</span>
-          <span class="book book-three">📕</span>
-          <span class="plant">🌿</span>
-          <span class="floating-star star-one">✦</span>
-          <span class="floating-star star-two">✧</span>
+      <div class="hero-art" aria-label="រូប Bot មិត្តជួយណែនាំការអាន">
+        <div class="art-orbit orbit-one"></div>
+        <div class="art-orbit orbit-two"></div>
+        <span class="art-star star-a">✦</span>
+        <span class="art-star star-b">✧</span>
+        <span class="art-heart">♡</span>
+        <div class="bot">
+          <div class="bot-antenna"><i></i></div>
+          <div class="bot-head">
+            <div class="bot-ear ear-left"></div><div class="bot-ear ear-right"></div>
+            <div class="bot-face">
+              <span class="bot-eye"></span><span class="bot-eye"></span>
+              <span class="bot-smile"></span>
+            </div>
+            <span class="bot-blush blush-left"></span><span class="bot-blush blush-right"></span>
+          </div>
+          <div class="bot-neck"></div>
+          <div class="bot-body">
+            <div class="bot-badge"><BookOpen :size="22" /></div>
+            <span class="bot-button"></span>
+          </div>
+          <div class="bot-arm arm-left"></div><div class="bot-arm arm-right"></div>
+          <div class="bot-foot foot-left"></div><div class="bot-foot foot-right"></div>
         </div>
+        <div class="bot-bubble"><span>🤖</span><div><strong>សួស្ដីមិត្តអ្នកអាន!</strong><p>{{ botMessage }}</p></div></div>
       </div>
-    </header>
+    </section>
 
-    <!-- Statistics -->
-    <section class="stats-grid" aria-label="ស្ថិតិបណ្ណាល័យ">
-      <article class="stat-card green-card">
-        <div class="stat-top">
-          <div class="stat-icon green-icon">
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 7v5l3 2"/>
-            </svg>
-          </div>
-          <span class="trend positive">↗ 12%</span>
-        </div>
-        <p class="stat-label">ម៉ោងសិក្សា</p>
-        <h2>12.5 <small>ម៉ោង</small></h2>
-        <p class="stat-description">អ្នកកំពុងខិតខំបានល្អ 🌱</p>
-        <div class="mini-bars">
-          <i v-for="(bar, i) in miniBars" :key="i"
-             :style="{ height: bar + '%' }"></i>
-        </div>
+    <!-- Personal overview, not admin analytics -->
+    <section class="quick-stats">
+      <article class="quick-stat">
+        <span class="stat-icon mint"><BookOpen :size="21" /></span>
+        <div><span class="stat-label">សៀវភៅដែលខ្ញុំខ្ចី</span><strong>{{ myLoans.length }}</strong><small>សំណើ/កំណត់ត្រារបស់អ្នក</small></div>
       </article>
-
-      <article class="stat-card coral-card">
-        <div class="stat-top">
-          <div class="stat-icon coral-icon">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/>
-              <path d="M4 5.5V21M8 7h8M8 11h7"/>
-            </svg>
-          </div>
-          <span class="trend coral-trend">📖 អ្នកអាន</span>
-        </div>
-        <p class="stat-label">សៀវភៅដែលបានអាន</p>
-        <h2>8 <small>ក្បាល</small></h2>
-        <p class="stat-description">កំពុងខ្ចី 2 ក្បាល</p>
-        <div class="stat-progress">
-          <span style="width: 68%"></span>
-        </div>
-        <p class="progress-caption">គោលដៅប្រចាំខែ 68%</p>
+      <article class="quick-stat">
+        <span class="stat-icon peach"><Flame :size="21" /></span>
+        <div><span class="stat-label">ថ្ងៃអានជាប់គ្នា</span><strong>{{ rewards.streak }} <small>ថ្ងៃ</small></strong><small>គោលដៅ ២ ថ្ងៃ</small></div>
       </article>
-
-      <article class="stat-card gold-card">
-        <div class="stat-top">
-          <div class="stat-icon gold-icon">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>
-            </svg>
-          </div>
-          <span class="trend gold-trend">🏆 រង្វាន់</span>
-        </div>
-        <p class="stat-label">ពិន្ទុសិក្សា</p>
-        <h2>1,240 <small>ពិន្ទុ</small></h2>
-        <p class="stat-description">ខ្វះ 260 ពិន្ទុដល់រង្វាន់បន្ទាប់</p>
-        <div class="stat-progress gold-progress">
-          <span style="width: 82%"></span>
-        </div>
-        <p class="progress-caption">រង្វាន់បន្ទាប់ 82%</p>
+      <article class="quick-stat">
+        <span class="stat-icon lilac"><Star :size="21" /></span>
+        <div><span class="stat-label">ពិន្ទុរបស់ខ្ញុំ</span><strong>{{ rewards.points.toLocaleString() }}</strong><small>ពិន្ទុអានសៀវភៅ</small></div>
       </article>
     </section>
 
-    <!-- Analytics -->
-    <section class="main-grid">
-      <article class="panel analytics-panel">
-        <div class="panel-header">
-          <div>
-            <span class="section-eyebrow">OVERVIEW</span>
-            <h2>ស្ថិតិការប្រើប្រាស់បន្ទប់</h2>
-            <p>ការប្រើប្រាស់កន្លែងសិក្សាប្រចាំសប្ដាហ៍</p>
-          </div>
-
-          <span class="sample-badge">● ទិន្នន័យគំរូ</span>
+    <!-- Reading streak -->
+    <section class="reading-card">
+      <div class="reading-main">
+        <div class="reading-heading">
+          <div class="reading-icon"><CalendarCheck :size="22" /></div>
+          <div><span class="section-kicker">YOUR DAILY READING</span><h2>បង្កើតទម្លាប់អានរាល់ថ្ងៃ 🌱</h2></div>
         </div>
-
-        <div class="chart-legend">
-          <span><i class="legend-dot booked-dot"></i> ម៉ោងបានកក់</span>
-          <span><i class="legend-dot free-dot"></i> កន្លែងនៅសល់</span>
-        </div>
-
-        <div class="chart">
-          <div class="y-axis">
-            <span>100%</span>
-            <span>75%</span>
-            <span>50%</span>
-            <span>25%</span>
-            <span>0%</span>
-          </div>
-
-          <div class="chart-area">
-            <div class="grid-lines">
-              <i v-for="n in 5" :key="n"></i>
-            </div>
-
-            <div class="chart-columns">
-              <div class="chart-day"
-                   v-for="day in chartData"
-                   :key="day.label">
-                <div class="bar-pair">
-                  <div class="bar free-bar"
-                       :style="{ height: day.free + '%' }"></div>
-                  <div class="bar booked-bar"
-                       :style="{ height: day.booked + '%' }"></div>
-                </div>
-                <span>{{ day.label }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="analytics-footer">
-          <div>
-            <span class="footer-label">ការប្រើប្រាស់ជាមធ្យម</span>
-            <strong>68%</strong>
-          </div>
-          <span class="footer-trend">↗ 8% ធៀបនឹងសប្ដាហ៍មុន</span>
-        </div>
-      </article>
-
-      <!-- Popular Hours -->
-      <article class="panel hours-panel">
-        <div class="panel-header">
-          <div>
-            <span class="section-eyebrow">POPULAR TIME</span>
-            <h2>ម៉ោងសិក្សាពេញនិយម</h2>
-            <p>ពេលវេលាដែលមានអ្នកសិក្សាច្រើន</p>
-          </div>
-          <span class="time-icon">🕒</span>
-        </div>
-
-        <div class="hours-list">
-          <div class="hour-item"
-               v-for="hour in popularHours"
-               :key="hour.label">
-            <div class="hour-label">
-              <span>{{ hour.label }}</span>
-              <strong>{{ hour.value }}%</strong>
-            </div>
-            <div class="hour-track">
-              <span :style="{ width: hour.value + '%' }"
-                    :class="{ peak: hour.value >= 90 }"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="quiet-note">
-          <span class="quiet-emoji">🌿</span>
-          <div>
-            <strong>ចង់សិក្សាដោយស្ងប់ស្ងាត់?</strong>
-            <p>អាចមានកន្លែងទំនេរនៅជាន់ទី ២។</p>
-          </div>
-        </div>
-      </article>
-    </section>
-
-    <!-- Book Recommendations -->
-    <section class="panel books-panel">
-      <div class="panel-header">
-        <div>
-          <span class="section-eyebrow">YOUR NEXT READ</span>
-          <h2>សៀវភៅណែនាំសម្រាប់អ្នក 💚</h2>
-          <p>ជ្រើសរើសសៀវភៅដែលអ្នកចង់អានបន្ទាប់</p>
-        </div>
-
-        <button class="text-link" @click="navigateTo('catalog')">
-          មើលសៀវភៅទាំងអស់ →
+        <p class="reading-description">ចុចបញ្ជាក់នៅពេលអ្នកបានអានសៀវភៅថ្ងៃនេះ។ អ្នកទទួលបាន <strong>១០ ពិន្ទុ</strong> ក្នុងមួយថ្ងៃ ហើយអាចតាមដានគោលដៅអានជាប់គ្នា ២ ថ្ងៃ។</p>
+        <div class="progress-label"><span>ដំណើរទៅកាន់ ២ ថ្ងៃ</span><strong>{{ Math.min(rewards.streak, 2) }} / 2 ថ្ងៃ</strong></div>
+        <div class="progress-track"><span :style="{ width: `${Math.min(rewards.streak, 2) / 2 * 100}%` }"></span></div>
+        <div class="progress-foot"><span>🌼 រាល់ថ្ងៃគឺជាជំហានតូចមួយ</span><span>{{ Math.min(100, rewards.streak / 2 * 100) }}%</span></div>
+      </div>
+      <div class="checkin-box">
+        <div class="checkin-emoji">{{ checkedInToday ? '🌟' : '📖' }}</div>
+        <strong>{{ checkedInToday ? 'ថ្ងៃនេះអ្នកបានអានហើយ!' : 'បានអានថ្ងៃនេះហើយឬនៅ?' }}</strong>
+        <p>{{ checkedInToday ? 'ល្អណាស់! ត្រឡប់មកអានម្ដងទៀតថ្ងៃស្អែក។' : 'ចំណាយពេលតែបន្តិច ដើម្បីទទួលបានពិន្ទុ។' }}</p>
+        <button class="btn checkin-btn" :class="{ 'is-done': checkedInToday }" :disabled="checkedInToday" @click="checkIn">
+          <CheckCircle2 v-if="checkedInToday" :size="18" />
+          <Flame v-else :size="18" />
+          {{ checkedInToday ? 'បានកត់ត្រាហើយ' : 'ខ្ញុំបានអានថ្ងៃនេះ +១០ ពិន្ទុ' }}
         </button>
+        <small v-if="checkinMessage" class="checkin-message">{{ checkinMessage }}</small>
       </div>
+    </section>
 
-      <div class="book-grid">
-        <article class="book-card" v-for="book in recommendedBooks"
-                 :key="book.id">
+    <!-- Rewards -->
+    <section class="section-block">
+      <div class="section-heading">
+        <div><span class="section-kicker">LITTLE REWARDS, BIG PROGRESS</span><h2>រង្វាន់សម្រាប់មិត្តអ្នកអាន 🎁</h2><p>ខិតខំអាន ហើយប្រមូលពិន្ទុដើម្បីទទួលរង្វាន់។</p></div>
+        <span class="points-pill"><Star :size="15" /> {{ rewards.points }} ពិន្ទុ</span>
+      </div>
+      <div class="rewards-grid">
+        <article class="reward-card book-reward">
+          <div class="reward-visual"><span class="reward-sparkle">✦</span><span class="reward-emoji">📚</span><span class="reward-ribbon">BOOK</span></div>
+          <div class="reward-content"><span class="reward-type">រង្វាន់សៀវភៅ</span><h3>សៀវភៅមួយក្បាល</h3><p>ប្រើពិន្ទុដើម្បីស្នើសុំរង្វាន់សៀវភៅពីបណ្ណាល័យ។</p><div class="reward-bottom"><span><Star :size="15" /> ៥០០ ពិន្ទុ</span><button class="reward-btn" :disabled="rewards.points < 500" @click="redeemReward('book')">ប្ដូររង្វាន់ <ArrowRight :size="15" /></button></div></div>
+        </article>
+        <article class="reward-card certificate-reward">
+          <div class="reward-visual"><span class="certificate-sun">✦</span><span class="reward-emoji">🏅</span><span class="certificate-paper">CERTIFICATE</span></div>
+          <div class="reward-content"><span class="reward-type">រង្វាន់ពិសេស</span><h3>ប័ណ្ណសរសើរអ្នកអាន</h3><p>អានជាប់គ្នា ២ ថ្ងៃ ដើម្បីដោះសោរប័ណ្ណសរសើរ។</p><div class="reward-bottom"><span><Trophy :size="15" /> {{ rewards.streak >= 2 ? 'បានដោះសោហើយ' : `${Math.min(rewards.streak, 2)} / 2 ថ្ងៃ` }}</span><button class="reward-btn" :disabled="rewards.streak < 2 || rewards.certificateRedeemed" @click="redeemReward('certificate')">{{ rewards.certificateRedeemed ? 'បានស្នើសុំហើយ' : rewards.streak >= 2 ? 'ទទួលប័ណ្ណ' : 'បន្តអាន' }}</button></div></div>
+        </article>
+      </div>
+      <p class="reward-note"><Info :size="15" /> រង្វាន់នៅទីនេះជាការស្នើសុំក្នុងគំរូ Front-end។ បណ្ណាល័យត្រូវបញ្ជាក់មុនពេលផ្ដល់រង្វាន់ពិតប្រាកដ។</p>
+    </section>
+
+    <!-- Recommended books -->
+    <section class="section-block">
+      <div class="section-heading">
+        <div><span class="section-kicker">PICKED FOR YOU</span><h2>សៀវភៅណែនាំសម្រាប់អ្នក 💚</h2><p>ស្វែងរកសៀវភៅថ្មីដែលអាចជួយបើកទ្វារចំណេះដឹង។</p></div>
+        <button class="link-button" @click="navigateTo('catalog')">មើលទាំងអស់ <ArrowRight :size="16" /></button>
+      </div>
+      <div class="books-grid">
+        <article v-for="book in recommendedBooks" :key="book.id" class="book-card">
           <div class="book-cover" :class="book.color">
-            <span class="book-decoration">{{ book.emoji }}</span>
-            <span class="book-category">{{ book.category }}</span>
-            <strong data-no-translate>{{ book.title }}</strong>
-            <span class="cover-subtitle">{{ book.subtitle }}</span>
+            <span class="cover-deco">{{ book.emoji }}</span><span class="cover-label">{{ book.category }}</span>
+            <strong>{{ book.title }}</strong><span class="cover-subtitle">{{ book.subtitle }}</span>
           </div>
-
-          <div class="book-details">
-            <h3 data-no-translate>{{ book.title }}</h3>
-            <p data-no-translate>{{ book.author }}</p>
-
-            <div class="book-bottom">
-              <span class="available">
-                <i></i> {{ book.available ? 'មានសៀវភៅ' : 'អស់សៀវភៅ' }}
-              </span>
-
-              <button
-                class="borrow-btn"
-                :disabled="!book.available"
-                @click="borrowBook(book)"
-              >
-                {{ book.available ? 'ខ្ចីសៀវភៅ +' : 'អស់ស្តុក' }}
-              </button>
-            </div>
-          </div>
+          <div class="book-info"><h3>{{ book.title }}</h3><p>{{ book.author }}</p><div class="book-card-bottom"><span class="availability"><i></i> សៀវភៅណែនាំ</span><button class="mini-action" @click="navigateTo('catalog')">មើលសៀវភៅ <ArrowRight :size="14" /></button></div></div>
         </article>
       </div>
     </section>
 
-    <!-- Schedule -->
-    <section class="bottom-grid">
-      <article class="panel schedule-panel">
-        <div class="panel-header">
-          <div>
-            <span class="section-eyebrow">UPCOMING</span>
-            <h2>កាលវិភាគបន្ទាប់ 📅</h2>
-            <p>គម្រោងសិក្សារបស់អ្នក</p>
-          </div>
-
-          <button class="text-link" @click="navigateTo('rooms')">
-            មើលទាំងអស់ →
-          </button>
-        </div>
-
-        <div class="booking-row">
-          <div class="date-tile">
-            <strong>14</strong>
-            <span>តុលា</span>
-          </div>
-
-          <div class="booking-info">
-            <strong>បន្ទប់ស្ងប់ស្ងាត់ · 2B</strong>
-            <p>🕑 ម៉ោង ២–៤ រសៀល</p>
-            <span>📍 អគារខាងកើត · ជាន់ទី ២</span>
-          </div>
-
-          <span class="confirmed-badge">✓ បានបញ្ជាក់</span>
-        </div>
-      </article>
-
-      <article class="streak-card">
-        <div class="streak-top">
-          <span class="streak-emoji">🌟</span>
-          <span class="streak-tag">STUDY STREAK</span>
-        </div>
-
-        <h2>អ្នកកំពុងខិតខំបានល្អ!</h2>
-        <p>ការសិក្សាបន្តិចម្តងៗរាល់ថ្ងៃ នឹងនាំអ្នកទៅកាន់គោលដៅ។</p>
-
-        <div class="streak-count">
-          <strong>4</strong>
-          <span>ថ្ងៃជាប់គ្នា 🔥</span>
-        </div>
-
-        <div class="week-dots">
-          <div v-for="day in weekDays" :key="day.label"
-               class="week-day">
-            <span :class="{ completed: day.done }">
-              {{ day.done ? '✓' : '·' }}
-            </span>
-            <small>{{ day.label }}</small>
-          </div>
-        </div>
-      </article>
+    <!-- Personal shortcuts only -->
+    <section class="section-block shortcuts-section">
+      <div class="section-heading"><div><span class="section-kicker">YOUR LIBRARY SPACE</span><h2>ផ្លូវកាត់របស់អ្នក ✨</h2><p>ចូលទៅកាន់សេវាកម្មដែលអ្នកប្រើញឹកញាប់។</p></div></div>
+      <div class="shortcut-grid">
+        <button class="shortcut-card" @click="navigateTo('catalog')"><span class="shortcut-icon mint"><BookOpen :size="22" /></span><span><strong>ស្វែងរកសៀវភៅ</strong><small>ស្វែងរកតាមចំណងជើង និងប្រភេទ</small></span><ChevronRight :size="19" /></button>
+        <button class="shortcut-card" @click="navigateTo('loans')"><span class="shortcut-icon peach"><BookmarkCheck :size="22" /></span><span><strong>សៀវភៅដែលខ្ញុំខ្ចី</strong><small>ពិនិត្យសំណើ និងស្ថានភាពខ្ចី</small></span><ChevronRight :size="19" /></button>
+        <button class="shortcut-card" @click="navigateTo('rooms')"><span class="shortcut-icon blue"><Armchair :size="22" /></span><span><strong>កក់បន្ទប់សិក្សា</strong><small>ស្វែងរកកន្លែងសិក្សារបស់អ្នក</small></span><ChevronRight :size="19" /></button>
+        <button class="shortcut-card" @click="openProfile"><span class="shortcut-icon lilac"><UserRound :size="22" /></span><span><strong>Profile របស់ខ្ញុំ</strong><small>កែព័ត៌មាន និងរូបភាពផ្ទាល់ខ្លួន</small></span><ChevronRight :size="19" /></button>
+      </div>
     </section>
 
-    <!-- Borrow confirmation dialog -->
-    <div v-if="selectedBook"
-         class="modal-backdrop"
-         @click.self="selectedBook = null"
-         @keydown.esc="selectedBook = null">
-      <section class="borrow-modal"
-               role="dialog"
-               aria-modal="true"
-               aria-labelledby="borrow-title">
-        <button class="modal-close" @click="selectedBook = null"
-                aria-label="បិទ">×</button>
-
-        <div class="modal-icon">📚</div>
-        <span class="section-eyebrow">BOOK REQUEST</span>
-        <h2 id="borrow-title">ស្នើសុំខ្ចីសៀវភៅ</h2>
-        <p class="modal-description">
-          អ្នកបានជ្រើសរើសសៀវភៅ «{{ selectedBook.title }}»
-        </p>
-
-        <div class="selected-book">
-          <span>{{ selectedBook.emoji }}</span>
-          <div>
-            <strong>{{ selectedBook.title }}</strong>
-            <p>{{ selectedBook.author }}</p>
+    <!-- Profile edit modal -->
+    <div v-if="profileOpen" class="modal-backdrop" @click.self="profileOpen = false">
+      <section class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+        <button class="modal-close" @click="profileOpen = false" aria-label="បិទ"><X :size="20" /></button>
+        <div class="profile-modal-heading"><span class="section-kicker">YOUR PERSONAL SPACE</span><h2 id="profile-title">កែ Profile របស់អ្នក 👤</h2><p>ព័ត៌មាននេះប្រើសម្រាប់ស្វាគមន៍អ្នកនៅលើទំព័រ Home។</p></div>
+        <div class="avatar-editor">
+          <div class="avatar-preview">
+            <img v-if="profileDraft.avatar" :src="profileDraft.avatar" alt="រូប Profile" />
+            <span v-else>{{ initials(profileDraft.fullName) }}</span>
           </div>
+          <div><label class="upload-btn"><Camera :size="16" /> ប្ដូររូប Profile<input type="file" accept="image/*" @change="handleAvatar" hidden /></label><p>PNG, JPG ឬ WEBP · មិនលើស 2MB</p></div>
         </div>
-
-        <label class="form-label" for="borrow-date">ថ្ងៃត្រូវការខ្ចី</label>
-        <input id="borrow-date" v-model="borrowDate"
-               type="date" class="date-input"
-               :min="today" required />
-
-        <label class="form-label" for="borrow-duration">រយៈពេលខ្ចី</label>
-        <select id="borrow-duration" v-model="borrowDuration"
-                class="date-input">
-          <option value="7">7 ថ្ងៃ</option>
-          <option value="14">14 ថ្ងៃ</option>
-          <option value="21">21 ថ្ងៃ</option>
-        </select>
-
-        <p v-if="formError" class="form-error">{{ formError }}</p>
-
-        <button class="primary-btn modal-submit" @click="submitBorrow">
-          បញ្ជាក់ការស្នើសុំ <span>✓</span>
-        </button>
-
-        <button class="modal-cancel" @click="selectedBook = null">
-          បោះបង់
-        </button>
+        <label class="field-label" for="profile-name">ឈ្មោះពេញ</label><input id="profile-name" v-model.trim="profileDraft.fullName" class="field-input" placeholder="បញ្ចូលឈ្មោះរបស់អ្នក" />
+        <label class="field-label" for="profile-email">អ៊ីមែល</label><input id="profile-email" v-model.trim="profileDraft.email" class="field-input" type="email" placeholder="example@email.com" />
+        <label class="field-label" for="profile-phone">លេខទូរស័ព្ទ</label><input id="profile-phone" v-model.trim="profileDraft.phone" class="field-input" type="tel" placeholder="បញ្ចូលលេខទូរស័ព្ទ" />
+        <p v-if="profileError" class="profile-error">{{ profileError }}</p>
+        <button class="btn btn-primary save-profile" @click="saveProfile"><Check :size="18" /> រក្សាទុក Profile</button>
       </section>
     </div>
 
-    <!-- Success notification -->
-    <div v-if="successMessage" class="toast" role="status">
-      <span>🎉</span>
-      <div>
-        <strong>ជោគជ័យ!</strong>
-        <p>{{ successMessage }}</p>
-      </div>
-      <button @click="successMessage = ''" aria-label="បិទ">×</button>
+    <!-- Reward request confirmation -->
+    <div v-if="rewardDialog" class="modal-backdrop" @click.self="rewardDialog = ''">
+      <section class="reward-modal" role="dialog" aria-modal="true">
+        <button class="modal-close" @click="rewardDialog = ''" aria-label="បិទ"><X :size="20" /></button>
+        <div class="reward-modal-emoji">{{ rewardDialog === 'book' ? '📚' : '🏅' }}</div>
+        <h2>{{ rewardDialog === 'book' ? 'ស្នើសុំរង្វាន់សៀវភៅ' : 'ស្នើសុំប័ណ្ណសរសើរ' }}</h2>
+        <p>{{ rewardDialog === 'book' ? 'ពិន្ទុ ៥០០ នឹងត្រូវប្រើសម្រាប់សំណើនេះ។' : 'អ្នកបានបំពេញគោលដៅអានជាប់គ្នា ២ ថ្ងៃហើយ!' }}</p>
+        <div class="modal-actions"><button class="btn btn-soft" @click="rewardDialog = ''">បោះបង់</button><button class="btn btn-primary" @click="confirmRedeem">បញ្ជាក់សំណើ <Check :size="17" /></button></div>
+      </section>
     </div>
+
+    <div v-if="toastMessage" class="toast" role="status"><CheckCircle2 :size="21" /><span>{{ toastMessage }}</span><button @click="toastMessage = ''" aria-label="បិទ"><X :size="17" /></button></div>
   </main>
 </template>
 
 <script setup>
-import { inject, ref } from 'vue';
+import { computed, inject, onMounted, reactive, ref, watch } from 'vue';
+import {
+  Armchair, ArrowRight, BookmarkCheck, BookOpen, CalendarCheck, Camera,
+  Check, CheckCircle2, ChevronRight, Flame, Info, Sparkles, Star, Trophy,
+  UserRound, X
+} from '@lucide/vue';
 
 const emit = defineEmits(['navigate']);
-const locale = inject('locale');
+const locale = inject('locale', ref('km'));
+const studentProfile = inject('studentProfile', null);
 
-const miniBars = [36, 51, 42, 73, 57, 84, 63];
+const PROFILE_KEY = 'leafline_student';
+const REWARDS_KEY = 'leafline_reading_rewards';
+const LOANS_KEY = 'leafline_book_holds';
 
-const chartData = [
-  { label: 'ចន្ទ', free: 62, booked: 38 },
-  { label: 'អង្គារ', free: 78, booked: 52 },
-  { label: 'ពុធ', free: 56, booked: 34 },
-  { label: 'ព្រហស្បតិ៍', free: 91, booked: 71 },
-  { label: 'សុក្រ', free: 73, booked: 57 },
-  { label: 'សៅរ៍', free: 49, booked: 40 },
-  { label: 'អាទិត្យ', free: 38, booked: 26 },
+const defaultProfile = { fullName: '', studentId: '', email: '', phone: '', faculty: '', year: '', avatar: '' };
+const profile = reactive({ ...defaultProfile });
+const profileDraft = reactive({ ...defaultProfile });
+const profileOpen = ref(false);
+const profileError = ref('');
+const toastMessage = ref('');
+const checkinMessage = ref('');
+const rewardDialog = ref('');
+const pendingReward = ref('');
+
+const rewards = reactive({
+  points: 0,
+  streak: 0,
+  totalDays: 0,
+  lastReadDate: '',
+  certificateRedeemed: false,
+  history: []
+});
+
+const recommendedBooks = [
+  { id: 1, title: 'ទម្លាប់ល្អ', subtitle: 'BUILD GOOD HABITS', author: 'សៀវភៅអភិវឌ្ឍខ្លួន', category: 'SELF GROWTH', emoji: '🌱', color: 'cover-green' },
+  { id: 2, title: 'សិល្បៈនៃការគិត', subtitle: 'THINK BETTER', author: 'សៀវភៅចំណេះដឹង', category: 'KNOWLEDGE', emoji: '💡', color: 'cover-yellow' },
+  { id: 3, title: 'ពិភពវិទ្យាសាស្ត្រ', subtitle: 'EXPLORE SCIENCE', author: 'សៀវភៅវិទ្យាសាស្ត្រ', category: 'SCIENCE', emoji: '🔭', color: 'cover-blue' },
+  { id: 4, title: 'រឿងនិទាន', subtitle: 'STORIES & DREAMS', author: 'សៀវភៅអានកម្សាន្ត', category: 'STORIES', emoji: '🦋', color: 'cover-pink' }
 ];
 
-const popularHours = [
-  { label: '១០ ព្រឹក', value: 42 },
-  { label: '១២ ថ្ងៃ', value: 64 },
-  { label: '២ រសៀល', value: 92 },
-  { label: '៤ រសៀល', value: 78 },
-  { label: '៦ ល្ងាច', value: 53 },
-];
+function readLocal(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
-const recommendedBooks = ref([
-  {
-    id: 1,
-    title: 'ទម្លាប់ល្អ',
-    subtitle: 'BUILD GOOD HABITS',
-    author: 'សៀវភៅអភិវឌ្ឍខ្លួន',
-    category: 'SELF GROWTH',
-    emoji: '🌱',
-    color: 'cover-green',
-    available: true,
-  },
-  {
-    id: 2,
-    title: 'សិល្បៈនៃការគិត',
-    subtitle: 'THINK BETTER',
-    author: 'សៀវភៅចំណេះដឹង',
-    category: 'KNOWLEDGE',
-    emoji: '💡',
-    color: 'cover-yellow',
-    available: true,
-  },
-  {
-    id: 3,
-    title: 'ពិភពវិទ្យាសាស្ត្រ',
-    subtitle: 'EXPLORE SCIENCE',
-    author: 'សៀវភៅវិទ្យាសាស្ត្រ',
-    category: 'SCIENCE',
-    emoji: '🔭',
-    color: 'cover-blue',
-    available: true,
-  },
-  {
-    id: 4,
-    title: 'រឿងនិទាន',
-    subtitle: 'STORIES & DREAMS',
-    author: 'សៀវភៅអានកម្សាន្ត',
-    category: 'STORIES',
-    emoji: '🦋',
-    color: 'cover-pink',
-    available: true,
-  },
-]);
+function saveLocal(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch {
+    toastMessage.value = 'មិនអាចរក្សាទុកបានទេ។ សូមសាកល្បងរូបភាពតូចជាងនេះ។';
+    return false;
+  }
+}
 
-const weekDays = [
-  { label: 'ចន្ទ', done: true },
-  { label: 'អង្គារ', done: true },
-  { label: 'ពុធ', done: true },
-  { label: 'ព្រហស្បតិ៍', done: true },
-  { label: 'សុក្រ', done: false },
-  { label: 'សៅរ៍', done: false },
-  { label: 'អាទិត្យ', done: false },
-];
+function dateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
-const selectedBook = ref(null);
-const borrowDate = ref('');
-const borrowDuration = ref('7');
-const formError = ref('');
-const successMessage = ref('');
+function shiftDate(dateString, amount) {
+  const date = new Date(`${dateString}T12:00:00`);
+  date.setDate(date.getDate() + amount);
+  return dateKey(date);
+}
 
-const today = new Date().toLocaleDateString('en-CA');
+const todayKey = ref(dateKey());
+const checkedInToday = computed(() => rewards.lastReadDate === todayKey.value);
+const userName = computed(() => {
+  const name = profile.fullName?.trim();
+  if (!name) return 'មិត្តអ្នកអាន';
+  return name.split(/\s+/)[0];
+});
+const botMessage = computed(() => {
+  if (checkedInToday.value) return 'អ្នកបានបំពេញការអានថ្ងៃនេះហើយ។ អស្ចារ្យណាស់!';
+  if (rewards.streak >= 7) return `អ្នកអានជាប់គ្នា ${rewards.streak} ថ្ងៃហើយ! បន្តទៀតណា។`;
+  return 'តោះអានសៀវភៅថ្ងៃនេះ ដើម្បីទទួលបាន ១០ ពិន្ទុ!';
+});
+const myLoans = computed(() => {
+  const raw = readLocal(LOANS_KEY, []);
+  if (Array.isArray(raw)) return raw;
+  if (raw && Array.isArray(raw.items)) return raw.items;
+  if (raw && Array.isArray(raw.holds)) return raw.holds;
+  return [];
+});
 
 function navigateTo(page) {
   emit('navigate', page);
 }
 
-function borrowBook(book) {
-  if (!book.available) return;
-
-  selectedBook.value = book;
-  borrowDate.value = today;
-  borrowDuration.value = '7';
-  formError.value = '';
-  successMessage.value = '';
+function syncProfile(source) {
+  if (!source || typeof source !== 'object') return;
+  Object.assign(profile, { ...defaultProfile, ...source });
 }
 
-function submitBorrow() {
-  if (!selectedBook.value) return;
+function persistProfile() {
+  const value = { ...profile };
+  saveLocal(PROFILE_KEY, value);
+  if (studentProfile?.value && typeof studentProfile.value === 'object') {
+    Object.assign(studentProfile.value, value);
+  }
+}
 
-  if (!borrowDate.value || borrowDate.value < today) {
-    formError.value = 'សូមជ្រើសរើសថ្ងៃខ្ចីឱ្យបានត្រឹមត្រូវ។';
+function openProfile() {
+  Object.assign(profileDraft, { ...defaultProfile, ...profile });
+  profileError.value = '';
+  profileOpen.value = true;
+}
+
+function saveProfile() {
+  if (!profileDraft.fullName.trim()) {
+    profileError.value = 'សូមបញ្ចូលឈ្មោះរបស់អ្នកជាមុនសិន។';
     return;
   }
-
-  const bookTitle = selectedBook.value.title;
-  const duration = borrowDuration.value;
-
-  // Demo only: connect this action to your backend/API
-  // when the real borrowing system is available.
-  successMessage.value =
-    `បានកត់ត្រាសំណើខ្ចី «${bookTitle}» រយៈពេល ${duration} ថ្ងៃ។`;
-
-  selectedBook.value = null;
+  Object.assign(profile, { ...profileDraft, fullName: profileDraft.fullName.trim() });
+  persistProfile();
+  profileOpen.value = false;
+  toastMessage.value = 'បានរក្សាទុក Profile របស់អ្នករួចរាល់ហើយ 💚';
 }
+
+function initials(name = '') {
+  const clean = name.trim();
+  return clean ? clean.split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase() : 'U';
+}
+
+function handleAvatar(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    profileError.value = 'សូមជ្រើសរើសឯកសាររូបភាព។';
+    event.target.value = '';
+    return;
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    profileError.value = 'រូបភាពធំពេក។ សូមជ្រើសរើសរូបភាពតូចជាង 2MB។';
+    event.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    profileDraft.avatar = String(reader.result || '');
+    profileError.value = '';
+  };
+  reader.onerror = () => { profileError.value = 'មិនអាចអានរូបភាពនេះបានទេ។'; };
+  reader.readAsDataURL(file);
+}
+
+function saveRewards() {
+  saveLocal(REWARDS_KEY, { ...rewards, history: [...rewards.history] });
+}
+
+function checkIn() {
+  todayKey.value = dateKey();
+  if (checkedInToday.value) {
+    checkinMessage.value = 'អ្នកបានកត់ត្រាការអានថ្ងៃនេះរួចហើយ។';
+    return;
+  }
+  const yesterday = shiftDate(todayKey.value, -1);
+  rewards.streak = rewards.lastReadDate === yesterday ? rewards.streak + 1 : 1;
+  rewards.points += 10;
+  rewards.totalDays += 1;
+  rewards.lastReadDate = todayKey.value;
+  rewards.history.unshift({ date: todayKey.value, type: 'daily_reading', points: 10 });
+  rewards.history = rewards.history.slice(0, 100);
+  saveRewards();
+  checkinMessage.value = 'អស្ចារ្យ! អ្នកទទួលបាន ១០ ពិន្ទុហើយ 🎉';
+  toastMessage.value = 'បានកត់ត្រាការអានថ្ងៃនេះ +១០ ពិន្ទុ!';
+}
+
+function redeemReward(type) {
+  if (type === 'book' && rewards.points < 500) {
+    toastMessage.value = 'អ្នកត្រូវការយ៉ាងតិច ៥០០ ពិន្ទុដើម្បីស្នើសុំសៀវភៅ។';
+    return;
+  }
+  if (type === 'certificate' && rewards.streak < 2) {
+    toastMessage.value = 'សូមអានជាប់គ្នា ២ ថ្ងៃសិនណា។';
+    return;
+  }
+  if (type === 'certificate' && rewards.certificateRedeemed) {
+    toastMessage.value = 'អ្នកបានស្នើសុំប័ណ្ណសរសើររួចហើយ។';
+    return;
+  }
+  pendingReward.value = type;
+  rewardDialog.value = type;
+}
+
+function confirmRedeem() {
+  const type = pendingReward.value;
+  if (type === 'book') {
+    if (rewards.points < 500) {
+      rewardDialog.value = '';
+      toastMessage.value = 'ពិន្ទុរបស់អ្នកមិនគ្រប់គ្រាន់ទេ។';
+      return;
+    }
+    rewards.points -= 500;
+    rewards.history.unshift({ date: dateKey(), type: 'book_reward_request', points: -500, status: 'pending' });
+    toastMessage.value = 'បានបង្កើតសំណើរង្វាន់សៀវភៅ។ សូមរង់ចាំបណ្ណាល័យបញ្ជាក់។';
+  } else if (type === 'certificate') {
+    rewards.certificateRedeemed = true;
+    rewards.history.unshift({ date: dateKey(), type: 'certificate_request', points: 0, status: 'pending' });
+    toastMessage.value = 'បានបង្កើតសំណើប័ណ្ណសរសើរ។ សូមរង់ចាំបណ្ណាល័យបញ្ជាក់។';
+  }
+  rewards.history = rewards.history.slice(0, 100);
+  saveRewards();
+  rewardDialog.value = '';
+  pendingReward.value = '';
+}
+
+onMounted(() => {
+  todayKey.value = dateKey();
+  const storedProfile = readLocal(PROFILE_KEY, null);
+  if (storedProfile) syncProfile(storedProfile);
+  if (studentProfile?.value) syncProfile(studentProfile.value);
+  const storedRewards = readLocal(REWARDS_KEY, null);
+  if (storedRewards && typeof storedRewards === 'object') {
+    Object.assign(rewards, {
+      points: Number(storedRewards.points) || 0,
+      streak: Number(storedRewards.streak) || 0,
+      totalDays: Number(storedRewards.totalDays) || 0,
+      lastReadDate: storedRewards.lastReadDate || '',
+      certificateRedeemed: Boolean(storedRewards.certificateRedeemed),
+      history: Array.isArray(storedRewards.history) ? storedRewards.history : []
+    });
+  }
+  if (studentProfile?.value) persistProfile();
+});
+
+watch(
+  () => studentProfile?.value,
+  (value) => {
+    if (value && typeof value === 'object') {
+      syncProfile(value);
+      saveLocal(PROFILE_KEY, { ...profile });
+    }
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>
-.dashboard {
-  --green: #34734a;
-  --green-dark: #245b37;
-  --green-light: #eaf5ec;
-  --text: #24382a;
-  --muted: #849087;
-  --border: #e7eee8;
-
+.home-page {
+  --green: #2f7549;
+  --green-dark: #205a36;
+  --ink: #263d30;
+  --muted: #829087;
+  --line: #e7eee7;
   display: grid;
-  gap: 24px;
+  gap: 25px;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 8px;
-  color: var(--text);
-  box-sizing: border-box;
+  padding: 10px;
+  color: var(--ink);
   font-family: inherit;
 }
-
-.dashboard * {
-  box-sizing: border-box;
-}
-
-button,
-input,
-select {
-  font: inherit;
-}
-
-button {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.welcome-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 250px;
-  padding: 34px 38px;
-  overflow: hidden;
-  border: 1px solid #dcecdf;
-  border-radius: 24px;
-  background: linear-gradient(120deg, #f0f9f0, #fffaf0);
-}
-
-.welcome-content {
-  position: relative;
-  z-index: 1;
-  max-width: 650px;
-}
-
-.welcome-label,
-.section-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--green);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
-
-.sparkle {
-  font-size: 17px;
-}
-
-.welcome-card h1 {
-  margin: 17px 0 10px;
-  color: #23442e;
-  font-size: clamp(22px, 3vw, 32px);
-  line-height: 1.5;
-  font-weight: 800;
-}
-
-.welcome-card h1 span {
-  display: inline-block;
-  animation: flower-wave 2.5s ease-in-out infinite;
-}
-
-.welcome-card p {
-  max-width: 530px;
-  margin: 0;
-  color: #758278;
-  font-size: 13px;
-  line-height: 1.9;
-}
-
-.welcome-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 23px;
-}
-
-.primary-btn,
-.secondary-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  min-height: 45px;
-  padding: 12px 18px;
-  border-radius: 13px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform .2s, box-shadow .2s, background .2s;
-}
-
-.primary-btn {
-  border: 1px solid var(--green);
-  background: var(--green);
-  color: white;
-  box-shadow: 0 6px 15px #34734a24;
-}
-
-.primary-btn:hover {
-  transform: translateY(-2px);
-  background: var(--green-dark);
-  box-shadow: 0 9px 22px #34734a35;
-}
-
-.secondary-btn {
-  border: 1px solid #dce8dd;
-  background: #ffffffb8;
-  color: var(--green-dark);
-}
-
-.secondary-btn:hover {
-  background: white;
-  transform: translateY(-2px);
-}
-
-.arrow {
-  font-size: 17px;
-}
-
-.welcome-illustration {
-  flex: 0 0 210px;
-}
-
-.illustration-circle {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 190px;
-  height: 190px;
-  margin: auto;
-  border: 1px solid #d8ead8;
-  border-radius: 50%;
-  background: #ffffff7a;
-}
-
-.book {
-  position: absolute;
-  display: grid;
-  width: 64px;
-  height: 95px;
-  place-items: center;
-  border-radius: 9px;
-  font-size: 45px;
-  filter: drop-shadow(0 8px 7px #284a2c17);
-}
-
-.book-one {
-  transform: translate(-33px, 7px) rotate(-15deg);
-}
-
-.book-two {
-  transform: translate(20px, -4px) rotate(9deg);
-}
-
-.book-three {
-  transform: translate(0, 23px) rotate(3deg);
-}
-
-.plant {
-  position: absolute;
-  right: 7px;
-  bottom: 20px;
-  font-size: 40px;
-}
-
-.floating-star {
-  position: absolute;
-  color: #c79e45;
-  font-size: 27px;
-}
-
-.star-one {
-  top: 23px;
-  left: 24px;
-}
-
-.star-two {
-  top: 43px;
-  right: 19px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.stat-card,
-.panel {
-  min-width: 0;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: white;
-  box-shadow: 0 5px 20px #233b2a08;
-  transition: transform .22s, box-shadow .22s, border-color .22s;
-}
-
-.stat-card:hover,
-.panel:hover {
-  transform: translateY(-3px);
-  border-color: #d3e6d6;
-  box-shadow: 0 12px 28px #233b2a0e;
-}
-
-.stat-card {
-  position: relative;
-  min-height: 205px;
-  padding: 22px;
-  overflow: hidden;
-}
-
-.stat-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.stat-icon {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  place-items: center;
-  border-radius: 15px;
-}
-
-.stat-icon svg {
-  width: 23px;
-  height: 23px;
-  stroke: currentColor;
-  stroke-width: 1.7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.green-icon {
-  background: #e6f5e8;
-  color: #34734a;
-}
-
-.coral-icon {
-  background: #fff0e9;
-  color: #ce7655;
-}
-
-.gold-icon {
-  background: #fff5d9;
-  color: #b18a34;
-}
-
-.trend {
-  padding: 6px 9px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.positive {
-  background: #e9f7eb;
-  color: #34734a;
-}
-
-.coral-trend {
-  background: #fff1eb;
-  color: #c16c4d;
-}
-
-.gold-trend {
-  background: #fff6df;
-  color: #9d782d;
-}
-
-.stat-label {
-  margin: 17px 0 3px;
-  color: #7e8b81;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.stat-card h2 {
-  margin: 0;
-  color: #263d2d;
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -.8px;
-}
-
-.stat-card h2 small {
-  color: #8a958d;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0;
-}
-
-.stat-description {
-  margin: 6px 0 0;
-  color: #829087;
-  font-size: 10px;
-  line-height: 1.7;
-}
-
-.mini-bars {
-  position: absolute;
-  right: 22px;
-  bottom: 23px;
-  display: flex;
-  align-items: end;
-  gap: 5px;
-  height: 39px;
-}
-
-.mini-bars i {
-  width: 7px;
-  border-radius: 5px 5px 2px 2px;
-  background: #c7e6cb;
-}
-
-.stat-progress {
-  height: 6px;
-  margin-top: 13px;
-  overflow: hidden;
-  border-radius: 20px;
-  background: #edf2ed;
-}
-
-.stat-progress span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: #83b78c;
-}
-
-.gold-progress span {
-  background: #d7b15b;
-}
-
-.progress-caption {
-  margin: 7px 0 0;
-  color: #8a958d;
-  font-size: 9px;
-}
-
-.main-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(270px, .85fr);
-  gap: 20px;
-}
-
-.panel {
-  padding: 24px;
-}
-
-.panel-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-.section-eyebrow {
-  margin-bottom: 8px;
-  font-size: 9px;
-}
-
-.panel-header h2 {
-  margin: 0;
-  color: #263d2d;
-  font-size: 16px;
-  line-height: 1.6;
-  font-weight: 800;
-}
-
-.panel-header p {
-  margin: 4px 0 0;
-  color: #8a958d;
-  font-size: 11px;
-  line-height: 1.8;
-}
-
-.sample-badge {
-  flex: 0 0 auto;
-  padding: 7px 10px;
-  border: 1px solid #e5eee6;
-  border-radius: 10px;
-  color: #76877a;
-  font-size: 9px;
-}
-
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 25px;
-}
-
-.chart-legend span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #7e8b81;
-  font-size: 10px;
-}
-
-.legend-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 3px;
-}
-
-.booked-dot {
-  background: #34734a;
-}
-
-.free-dot {
-  background: #d8eadb;
-}
-
-.chart {
-  display: flex;
-  height: 195px;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.y-axis {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-bottom: 25px;
-  color: #a0aaa2;
-  font-size: 9px;
-}
-
-.chart-area {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-}
-
-.grid-lines {
-  position: absolute;
-  inset: 3px 0 25px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.grid-lines i {
-  border-top: 1px dashed #e9efe9;
-}
-
-.chart-columns {
-  position: absolute;
-  inset: 3px 0 0;
-  display: flex;
-  justify-content: space-around;
-  gap: 3px;
-}
-
-.chart-day {
-  z-index: 1;
-  display: flex;
-  width: 13%;
-  min-width: 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: end;
-  gap: 9px;
-  color: #839087;
-  font-size: 9px;
-}
-
-.chart-day > span {
-  white-space: nowrap;
-}
-
-.bar-pair {
-  display: flex;
-  align-items: end;
-  justify-content: center;
-  gap: 4px;
-  width: 100%;
-  height: 145px;
-}
-
-.bar {
-  width: 11px;
-  max-height: 100%;
-  border-radius: 5px 5px 2px 2px;
-  transition: height .4s ease;
-}
-
-.free-bar {
-  background: #d8eadb;
-}
-
-.booked-bar {
-  background: #34734a;
-}
-
-.analytics-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-  padding-top: 17px;
-  border-top: 1px solid #edf2ed;
-}
-
-.analytics-footer > div {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.footer-label {
-  color: #839087;
-  font-size: 10px;
-}
-
-.analytics-footer strong {
-  color: #34734a;
-  font-size: 19px;
-}
-
-.footer-trend {
-  color: #34734a;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.time-icon {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 14px;
-  background: #fff4e8;
-  font-size: 21px;
-}
-
-.hours-list {
-  display: grid;
-  gap: 21px;
-  margin-top: 28px;
-}
-
-.hour-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 9px;
-  color: #647268;
-  font-size: 11px;
-}
-
-.hour-label strong {
-  color: #34734a;
-  font-size: 10px;
-}
-
-.hour-track {
-  height: 9px;
-  overflow: hidden;
-  border-radius: 20px;
-  background: #edf3ed;
-}
-
-.hour-track span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: #a9cdb0;
-  transition: width .5s ease;
-}
-
-.hour-track span.peak {
-  background: linear-gradient(90deg, #34734a, #6baa78);
-}
-
-.quiet-note {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 28px;
-  padding: 15px;
-  border: 1px solid #dcecdf;
-  border-radius: 14px;
-  background: #f0f8f0;
-}
-
-.quiet-emoji {
-  font-size: 27px;
-}
-
-.quiet-note strong {
-  color: #356b43;
-  font-size: 11px;
-}
-
-.quiet-note p {
-  margin: 5px 0 0;
-  color: #819084;
-  font-size: 10px;
-  line-height: 1.7;
-}
-
-.books-panel {
-  overflow: hidden;
-}
-
-.text-link {
-  flex: 0 0 auto;
-  padding: 9px 11px;
-  border: 0;
-  border-radius: 10px;
-  background: #edf7ef;
-  color: #34734a;
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .2s;
-}
-
-.text-link:hover {
-  background: #dcefe0;
-}
-
-.book-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 17px;
-  margin-top: 24px;
-}
-
-.book-card {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid #e9efe9;
-  border-radius: 15px;
-  background: white;
-  transition: transform .2s, box-shadow .2s;
-}
-
-.book-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 9px 22px #233b2a12;
-}
-
-.book-cover {
-  position: relative;
-  display: flex;
-  min-height: 150px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 7px;
-  padding: 17px;
-  overflow: hidden;
-}
-
-.cover-green {
-  background: linear-gradient(145deg, #e4f3e4, #cce5ce);
-  color: #285c36;
-}
-
-.cover-yellow {
-  background: linear-gradient(145deg, #fff4d8, #f4e3ad);
-  color: #886523;
-}
-
-.cover-blue {
-  background: linear-gradient(145deg, #e3f0fc, #c6dff5);
-  color: #345e87;
-}
-
-.cover-pink {
-  background: linear-gradient(145deg, #ffedf0, #f6d5e2);
-  color: #a24c70;
-}
-
-.book-decoration {
-  position: absolute;
-  top: 15px;
-  right: 13px;
-  font-size: 35px;
-  opacity: .85;
-}
-
-.book-category {
-  max-width: 100%;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: .7px;
-}
-
-.book-cover > strong {
-  max-width: 100%;
-  font-size: 15px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-
-.cover-subtitle {
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: .3px;
-}
-
-.book-details {
-  padding: 14px;
-}
-
-.book-details h3 {
-  margin: 0;
-  color: #2c4031;
-  font-size: 12px;
-  line-height: 1.8;
-}
-
-.book-details > p {
-  margin: 3px 0 13px;
-  color: #8a958d;
-  font-size: 10px;
-}
-
-.book-bottom {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 9px;
-}
-
-.available {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #62816a;
-  font-size: 9px;
-}
-
-.available i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #65ad75;
-}
-
-.borrow-btn {
-  padding: 8px 10px;
-  border: 1px solid #dcecdf;
-  border-radius: 9px;
-  background: #eff8ef;
-  color: #34734a;
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.borrow-btn:hover:not(:disabled) {
-  background: #dcefe0;
-}
-
-.borrow-btn:disabled {
-  cursor: not-allowed;
-  opacity: .5;
-}
-
-.bottom-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(260px, .8fr);
-  gap: 20px;
-}
-
-.booking-row {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 22px;
-  padding-top: 20px;
-  border-top: 1px solid #edf2ed;
-}
-
-.date-tile {
-  display: flex;
-  width: 58px;
-  height: 65px;
-  flex: 0 0 auto;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #f4ded4;
-  border-radius: 14px;
-  background: #fff2eb;
-  color: #bd7053;
-}
-
-.date-tile strong {
-  font-size: 23px;
-  line-height: 1.2;
-}
-
-.date-tile span {
-  margin-top: 3px;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.booking-info {
-  display: grid;
-  min-width: 0;
-  gap: 6px;
-}
-
-.booking-info strong {
-  color: #2b4130;
-  font-size: 12px;
-}
-
-.booking-info p,
-.booking-info > span {
-  margin: 0;
-  color: #839087;
-  font-size: 10px;
-  line-height: 1.7;
-}
-
-.confirmed-badge {
-  margin-left: auto;
-  padding: 8px 10px;
-  border: 1px solid #d6ead8;
-  border-radius: 20px;
-  background: #edf8ef;
-  color: #34734a;
-  font-size: 9px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.streak-card {
-  padding: 25px;
-  border: 1px solid #f0e5c9;
-  border-radius: 20px;
-  background: linear-gradient(145deg, #fffdf6, #fff5dd);
-}
-
-.streak-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.streak-emoji {
-  font-size: 29px;
-}
-
-.streak-tag {
-  padding: 7px 9px;
-  border-radius: 9px;
-  background: #fff0c9;
-  color: #a17b30;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: .8px;
-}
-
-.streak-card h2 {
-  margin: 18px 0 7px;
-  color: #68532b;
-  font-size: 16px;
-}
-
-.streak-card > p {
-  margin: 0;
-  color: #948260;
-  font-size: 11px;
-  line-height: 1.9;
-}
-
-.streak-count {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-top: 17px;
-}
-
-.streak-count strong {
-  color: #b58a35;
-  font-size: 37px;
-  font-weight: 800;
-}
-
-.streak-count span {
-  color: #8b754b;
-  font-size: 11px;
-}
-
-.week-dots {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 15px;
-}
-
-.week-day {
-  display: grid;
-  justify-items: center;
-  gap: 7px;
-}
-
-.week-day > span {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border: 1px solid #efdfb8;
-  border-radius: 10px;
-  background: #fffaf0;
-  color: #c4a56a;
-  font-size: 12px;
-}
-
-.week-day > span.completed {
-  border-color: #e5c77f;
-  background: #f5dfa0;
-  color: #8e6c26;
-}
-
-.week-day small {
-  color: #9b8967;
-  font-size: 9px;
-}
-
-/* Borrow dialog */
-.modal-backdrop {
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  overflow-y: auto;
-  background: #14251bc0;
-  backdrop-filter: blur(5px);
-}
-
-.borrow-modal {
-  position: relative;
-  width: 100%;
-  max-width: 430px;
-  margin: auto;
-  padding: 30px;
-  border: 1px solid #e3eee4;
-  border-radius: 24px;
-  background: white;
-  box-shadow: 0 25px 80px #10201630;
-  animation: modal-in .22s ease-out;
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 17px;
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border: 0;
-  border-radius: 10px;
-  background: #f0f5f0;
-  color: #506654;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.modal-icon {
-  display: grid;
-  width: 60px;
-  height: 60px;
-  place-items: center;
-  margin-bottom: 20px;
-  border-radius: 19px;
-  background: #eaf6eb;
-  font-size: 30px;
-}
-
-.borrow-modal h2 {
-  margin: 0;
-  color: #294331;
-  font-size: 21px;
-}
-
-.modal-description {
-  margin: 10px 0 20px;
-  color: #829087;
-  font-size: 12px;
-  line-height: 1.8;
-}
-
-.selected-book {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 22px;
-  padding: 14px;
-  border: 1px solid #e4eee4;
-  border-radius: 14px;
-  background: #f7fbf7;
-}
-
-.selected-book > span {
-  font-size: 30px;
-}
-
-.selected-book strong {
-  color: #2d4934;
-  font-size: 12px;
-}
-
-.selected-book p {
-  margin: 5px 0 0;
-  color: #879288;
-  font-size: 10px;
-}
-
-.form-label {
-  display: block;
-  margin: 15px 0 8px;
-  color: #4b5f50;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.date-input {
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid #dfe9df;
-  border-radius: 11px;
-  outline: none;
-  background: white;
-  color: #304636;
-  font-size: 12px;
-}
-
-.date-input:focus {
-  border-color: #70a77c;
-  box-shadow: 0 0 0 3px #e6f4e8;
-}
-
-.form-error {
-  color: #c34f4f;
-  font-size: 11px;
-}
-
-.modal-submit {
-  width: 100%;
-  margin-top: 22px;
-}
-
-.modal-cancel {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: #7d8a80;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.modal-cancel:hover {
-  background: #f4f7f4;
-}
-
-.toast {
-  position: fixed;
-  z-index: 1100;
-  right: 24px;
-  bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  width: min(390px, calc(100vw - 32px));
-  padding: 17px;
-  border: 1px solid #d6ead8;
-  border-radius: 16px;
-  background: white;
-  box-shadow: 0 12px 35px #1b35231c;
-  animation: modal-in .25s ease-out;
-}
-
-.toast > span {
-  font-size: 28px;
-}
-
-.toast strong {
-  color: #34734a;
-  font-size: 13px;
-}
-
-.toast p {
-  margin: 5px 0 0;
-  color: #758278;
-  font-size: 11px;
-  line-height: 1.7;
-}
-
-.toast button {
-  align-self: flex-start;
-  margin-left: auto;
-  border: 0;
-  background: transparent;
-  color: #78857c;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-@keyframes flower-wave {
-  0%, 100% { transform: rotate(0); }
-  50% { transform: rotate(12deg); }
-}
-
-@keyframes modal-in {
-  from { opacity: 0; transform: translateY(10px) scale(.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@media (max-width: 1000px) {
-  .welcome-card {
-    padding: 27px;
-  }
-
-  .welcome-illustration {
-    flex-basis: 160px;
-  }
-
-  .illustration-circle {
-    width: 155px;
-    height: 155px;
-  }
-
-  .main-grid,
-  .bottom-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .book-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 620px) {
-  .dashboard {
-    gap: 16px;
-    padding: 2px;
-  }
-
-  .welcome-card {
-    min-height: auto;
-    padding: 23px 19px;
-    border-radius: 19px;
-  }
-
-  .welcome-card h1 {
-    font-size: 22px;
-  }
-
-  .welcome-card p {
-    font-size: 12px;
-  }
-
-  .welcome-illustration {
-    display: none;
-  }
-
-  .welcome-actions {
-    gap: 9px;
-  }
-
-  .primary-btn,
-  .secondary-btn {
-    padding: 11px 12px;
-    font-size: 11px;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 11px;
-  }
-
-  .stat-card {
-    min-height: 190px;
-    padding: 15px;
-    border-radius: 16px;
-  }
-
-  .stat-card:last-child {
-    grid-column: 1 / -1;
-    min-height: 175px;
-  }
-
-  .stat-card h2 {
-    font-size: 25px;
-  }
-
-  .stat-icon {
-    width: 38px;
-    height: 38px;
-  }
-
-  .trend {
-    font-size: 8px;
-  }
-
-  .panel {
-    padding: 18px 14px;
-    border-radius: 17px;
-  }
-
-  .panel-header h2 {
-    font-size: 14px;
-  }
-
-  .panel-header p {
-    font-size: 10px;
-  }
-
-  .sample-badge {
-    max-width: 100px;
-    padding: 6px;
-    font-size: 8px;
-  }
-
-  .chart {
-    height: 175px;
-    gap: 7px;
-  }
-
-  .bar-pair {
-    height: 125px;
-    gap: 3px;
-  }
-
-  .bar {
-    width: 7px;
-  }
-
-  .chart-day {
-    font-size: 8px;
-  }
-
-  .chart-day > span {
-    font-size: 7px;
-  }
-
-  .chart-legend {
-    gap: 11px;
-  }
-
-  .chart-legend span {
-    font-size: 9px;
-  }
-
-  .footer-trend {
-    font-size: 9px;
-  }
-
-  .book-grid {
-    gap: 10px;
-  }
-
-  .book-cover {
-    min-height: 130px;
-    padding: 12px;
-  }
-
-  .book-cover > strong {
-    font-size: 12px;
-  }
-
-  .book-decoration {
-    font-size: 28px;
-  }
-
-  .book-details {
-    padding: 11px;
-  }
-
-  .book-details h3 {
-    font-size: 11px;
-  }
-
-  .book-bottom {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .text-link {
-    padding: 8px;
-    font-size: 9px;
-  }
-
-  .booking-row {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .booking-info {
-    flex: 1;
-  }
-
-  .confirmed-badge {
-    margin-left: 70px;
-  }
-
-  .streak-card {
-    padding: 21px;
-  }
-
-  .borrow-modal {
-    padding: 23px;
-    border-radius: 20px;
-  }
-
-  .toast {
-    right: 16px;
-    bottom: 16px;
-  }
-}
-
-@media (max-width: 360px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-card:last-child {
-    grid-column: auto;
-  }
-
-  .welcome-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .book-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .book-cover {
-    min-height: 155px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dashboard *,
-  .dashboard *::before,
-  .dashboard *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
-  }
-}
+.home-page *, .home-page *::before, .home-page *::after { box-sizing: border-box; }
+button, input { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+.hero {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+  align-items: center; min-height: 300px; overflow: hidden; padding: 35px 42px;
+  border: 1px solid #dcecdf; border-radius: 28px;
+  background: radial-gradient(circle at 83% 18%, #fff 0, #fff0 28%), linear-gradient(115deg, #eff9f0 0%, #f7fbf4 48%, #fff6eb 100%);
+}
+.hero::before { content: ""; position: absolute; width: 260px; height: 260px; right: 12%; top: -160px; border-radius: 50%; background: #d6ebd8aa; }
+.hero-copy { position: relative; z-index: 2; max-width: 690px; }
+.eyebrow, .section-kicker { display: inline-flex; align-items: center; gap: 8px; color: #56815f; font-size: 10px; font-weight: 800; letter-spacing: 1.4px; }
+.eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: #72ad7b; box-shadow: 0 0 0 4px #dcefe0; }
+.hero h1 { margin: 18px 0 9px; color: #234a30; font-size: clamp(27px, 3.4vw, 39px); font-weight: 850; line-height: 1.35; overflow-wrap: anywhere; }
+.wave { display: inline-block; transform-origin: 70% 70%; animation: wave 2.8s ease-in-out infinite; }
+.hero-subtitle { max-width: 580px; margin: 0; color: #728176; font-size: 13px; line-height: 2; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 24px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 45px; padding: 12px 17px; border: 1px solid transparent; border-radius: 13px; font-size: 12px; font-weight: 750; cursor: pointer; transition: transform .2s, background .2s, box-shadow .2s; }
+.btn:hover:not(:disabled) { transform: translateY(-2px); }
+.btn-primary { background: var(--green); color: white; box-shadow: 0 7px 17px #2f754923; }
+.btn-primary:hover:not(:disabled) { background: var(--green-dark); box-shadow: 0 10px 22px #2f754936; }
+.btn-soft { border-color: #dbe8dc; background: #ffffffc9; color: #356746; }
+.btn-soft:hover:not(:disabled) { background: white; }
+.hero-note { display: flex; align-items: center; gap: 7px; margin-top: 20px; color: #7d9a80; font-size: 11px; }
+.hero-note svg { color: #d4a94c; }
+.hero-art { position: relative; display: grid; min-height: 230px; place-items: center; }
+.art-orbit { position: absolute; width: 215px; height: 215px; border: 1px dashed #b9d9bd; border-radius: 50%; }
+.orbit-two { width: 170px; height: 170px; border-style: solid; border-color: #d9e9d8; }
+.art-star, .art-heart { position: absolute; z-index: 2; color: #d6aa4f; font-size: 27px; animation: float 3.4s ease-in-out infinite; }
+.star-a { top: 13px; left: 19%; }.star-b { top: 37px; right: 13%; color: #7eaf86; animation-delay: .6s; }.art-heart { right: 17%; bottom: 30px; color: #e89a9b; font-size: 30px; }
+.bot { position: relative; z-index: 1; width: 145px; height: 175px; margin-top: 12px; }
+.bot-antenna { position: absolute; top: 0; left: 68px; width: 9px; height: 22px; border-radius: 7px; background: #75ad81; }
+.bot-antenna i { position: absolute; top: -8px; left: -4px; width: 17px; height: 17px; border: 3px solid #fff; border-radius: 50%; background: #e9bd5f; }
+.bot-head { position: absolute; top: 19px; left: 16px; width: 113px; height: 82px; border: 5px solid #fff; border-radius: 31px; background: linear-gradient(145deg, #b8dfbd, #78b789); box-shadow: 0 10px 0 #3b83544a, 0 15px 25px #316d4020; }
+.bot-ear { position: absolute; top: 24px; width: 13px; height: 30px; border: 3px solid #fff; border-radius: 8px; background: #f4d98f; }
+.ear-left { left: -14px; }.ear-right { right: -14px; }
+.bot-face { position: absolute; inset: 13px 12px 12px; display: flex; align-items: center; justify-content: center; gap: 24px; border-radius: 18px; background: #f8fff7; }
+.bot-eye { width: 8px; height: 11px; border-radius: 50%; background: #315e42; }
+.bot-smile { position: absolute; bottom: 12px; left: 40px; width: 17px; height: 8px; border-bottom: 3px solid #315e42; border-radius: 0 0 15px 15px; }
+.bot-blush { position: absolute; top: 46px; width: 13px; height: 7px; border-radius: 50%; background: #f3a4a0; opacity: .85; }.blush-left { left: 11px; }.blush-right { right: 11px; }
+.bot-neck { position: absolute; top: 99px; left: 63px; width: 20px; height: 11px; background: #6ca779; }
+.bot-body { position: absolute; top: 105px; left: 31px; display: grid; width: 83px; height: 57px; place-items: center; border: 4px solid white; border-radius: 23px 23px 17px 17px; background: linear-gradient(145deg, #a5d6ae, #69a979); box-shadow: 0 8px 0 #3b835433; }
+.bot-badge { display: grid; width: 37px; height: 32px; place-items: center; border-radius: 11px; background: #f7fff4; color: #438052; }
+.bot-button { position: absolute; right: 8px; bottom: 8px; width: 6px; height: 6px; border-radius: 50%; background: #f2cf7a; }
+.bot-arm { position: absolute; top: 115px; width: 19px; height: 37px; border: 4px solid #fff; border-radius: 12px; background: #8ac497; }.arm-left { left: 12px; transform: rotate(18deg); }.arm-right { right: 11px; transform: rotate(-25deg); }
+.bot-foot { position: absolute; top: 158px; width: 27px; height: 13px; border-radius: 8px 8px 11px 11px; background: #528e61; }.foot-left { left: 42px; }.foot-right { right: 42px; }
+.bot-bubble { position: absolute; right: -4px; bottom: -2px; display: flex; align-items: flex-start; gap: 9px; width: 220px; padding: 12px 14px; border: 1px solid #e3eddf; border-radius: 15px 15px 5px 15px; background: #ffffffed; box-shadow: 0 8px 25px #294b3010; }
+.bot-bubble > span { font-size: 21px; }.bot-bubble strong { display: block; color: #356947; font-size: 10px; }.bot-bubble p { margin: 4px 0 0; color: #849087; font-size: 9px; line-height: 1.7; }
+.quick-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.quick-stat { display: flex; align-items: center; gap: 14px; min-width: 0; padding: 19px; border: 1px solid var(--line); border-radius: 19px; background: #fff; box-shadow: 0 5px 20px #263d3007; }
+.stat-icon, .shortcut-icon { display: grid; flex: 0 0 auto; width: 47px; height: 47px; place-items: center; border-radius: 15px; }
+.mint { background: #e6f5e8; color: #438154; }.peach { background: #fff0e7; color: #ca805d; }.lilac { background: #f0ebff; color: #8b76c4; }.blue { background: #e8f3ff; color: #5e8ab8; }
+.quick-stat > div { display: grid; min-width: 0; gap: 4px; }.stat-label { color: #829087; font-size: 11px; }.quick-stat strong { color: #2c4934; font-size: 25px; line-height: 1.2; }.quick-stat strong small { font-size: 11px; font-weight: 600; }.quick-stat small { color: #9aa49b; font-size: 9px; }
+.reading-card { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .75fr); gap: 25px; padding: 27px; border: 1px solid #dcebdd; border-radius: 22px; background: linear-gradient(120deg, #f6fbf5, #fffdf7); }
+.reading-heading { display: flex; align-items: center; gap: 13px; }.reading-icon { display: grid; width: 46px; height: 46px; flex: 0 0 auto; place-items: center; border-radius: 15px; background: #e1f1e3; color: #39774b; }.reading-heading h2 { margin: 5px 0 0; color: #2d4d35; font-size: 17px; line-height: 1.6; }.reading-description { max-width: 640px; margin: 18px 0 22px; color: #7b897e; font-size: 11px; line-height: 2; }.reading-description strong { color: #3e7c4e; }
+.progress-label, .progress-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #6f8172; font-size: 10px; }.progress-label strong { color: #36764a; }.progress-track { height: 10px; margin-top: 10px; overflow: hidden; border-radius: 20px; background: #e5eee4; }.progress-track span { display: block; height: 100%; min-width: 0; border-radius: inherit; background: linear-gradient(90deg, #74b680, #367b4b); transition: width .4s; }.progress-foot { margin-top: 9px; color: #9aa59b; font-size: 9px; }
+.checkin-box { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 22px; border: 1px solid #f0e5ca; border-radius: 18px; background: #fffaf0; text-align: center; }.checkin-emoji { display: grid; width: 49px; height: 49px; place-items: center; border-radius: 16px; background: #ffefc9; font-size: 25px; }.checkin-box > strong { margin-top: 12px; color: #70592d; font-size: 12px; }.checkin-box > p { margin: 7px 0 14px; color: #998666; font-size: 10px; line-height: 1.8; }.checkin-btn { width: 100%; background: #c38f35; color: white; box-shadow: 0 6px 15px #c38f3520; }.checkin-btn:hover:not(:disabled) { background: #a97827; }.checkin-btn.is-done { border-color: #d7e9d7; background: #e5f4e6; color: #3d794b; box-shadow: none; cursor: default; }.checkin-btn:disabled { cursor: default; }.checkin-message { margin-top: 10px; color: #64836a; font-size: 10px; line-height: 1.6; }
+.section-block { display: grid; gap: 19px; }.section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }.section-heading h2 { margin: 6px 0 4px; color: #294431; font-size: 19px; line-height: 1.55; }.section-heading p { margin: 0; color: #879289; font-size: 11px; line-height: 1.8; }.points-pill { display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto; padding: 9px 12px; border: 1px solid #f0e3c4; border-radius: 20px; background: #fff9e9; color: #9d782c; font-size: 10px; font-weight: 800; }
+.rewards-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }.reward-card { display: grid; grid-template-columns: 135px minmax(0, 1fr); min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 19px; background: #fff; transition: transform .2s, box-shadow .2s; }.reward-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px #263d300d; }.reward-visual { position: relative; display: grid; min-height: 190px; place-items: center; overflow: hidden; background: linear-gradient(145deg, #e7f5e8, #cfe8d0); }.certificate-reward .reward-visual { background: linear-gradient(145deg, #fff1cf, #f5dfab); }.reward-visual::before { content: ""; position: absolute; width: 115px; height: 115px; border: 1px solid #ffffff90; border-radius: 50%; }.reward-emoji { position: relative; z-index: 1; font-size: 53px; filter: drop-shadow(0 7px 6px #375b331c); }.reward-sparkle, .certificate-sun { position: absolute; top: 20px; right: 20px; color: #7eae80; font-size: 25px; }.certificate-sun { color: #c49b43; }.reward-ribbon, .certificate-paper { position: absolute; bottom: 20px; padding: 6px 9px; border: 1px solid #ffffffa8; border-radius: 7px; background: #ffffff8a; color: #4b8055; font-size: 8px; font-weight: 850; letter-spacing: 1px; }.certificate-paper { color: #9b772d; }
+.reward-content { display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 20px; }.reward-type { color: #80a084; font-size: 9px; font-weight: 800; letter-spacing: .7px; }.reward-content h3 { margin: 7px 0; color: #2e4935; font-size: 15px; }.reward-content p { margin: 0; color: #859087; font-size: 10px; line-height: 1.9; }.reward-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 17px; padding-top: 13px; border-top: 1px solid #edf1ed; }.reward-bottom > span { display: inline-flex; align-items: center; gap: 5px; color: #a17c32; font-size: 10px; font-weight: 750; }.reward-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 11px; border: 1px solid #dceadd; border-radius: 10px; background: #eff8ef; color: #3d794b; font-size: 10px; font-weight: 750; cursor: pointer; }.reward-btn:hover:not(:disabled) { background: #dcefe0; }.reward-btn:disabled { cursor: not-allowed; opacity: .5; }.reward-note { display: flex; align-items: flex-start; gap: 7px; margin: -3px 0 0; color: #9a9f98; font-size: 10px; line-height: 1.8; }.reward-note svg { flex: 0 0 auto; margin-top: 2px; }
+.link-button { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; padding: 10px 12px; border: 1px solid #dcebdd; border-radius: 11px; background: #f0f8f0; color: #3d794b; font-size: 10px; font-weight: 750; cursor: pointer; }.link-button:hover { background: #e2f1e3; }
+.books-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }.book-card { min-width: 0; overflow: hidden; border: 1px solid #e8eee8; border-radius: 17px; background: white; transition: transform .2s, box-shadow .2s; }.book-card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px #263d3010; }.book-cover { position: relative; display: flex; min-height: 158px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; padding: 18px; overflow: hidden; }.cover-green { background: linear-gradient(145deg, #e3f3e4, #c8e4cc); color: #2c6439; }.cover-yellow { background: linear-gradient(145deg, #fff3d6, #f2e0ac); color: #886a27; }.cover-blue { background: linear-gradient(145deg, #e5f1ff, #cbdff6); color: #3b638b; }.cover-pink { background: linear-gradient(145deg, #ffedf2, #f5d6e2); color: #a25072; }.cover-deco { position: absolute; top: 13px; right: 13px; font-size: 33px; opacity: .9; }.cover-label { font-size: 8px; font-weight: 850; letter-spacing: .8px; }.book-cover strong { max-width: 100%; font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }.cover-subtitle { font-size: 8px; font-weight: 750; letter-spacing: .4px; }.book-info { padding: 14px; }.book-info h3 { margin: 0; color: #2f4936; font-size: 12px; line-height: 1.8; }.book-info > p { margin: 4px 0 14px; color: #929b93; font-size: 10px; }.book-card-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }.availability { display: inline-flex; align-items: center; gap: 5px; color: #7e8c80; font-size: 9px; }.availability i { width: 6px; height: 6px; border-radius: 50%; background: #76b680; }.mini-action { display: inline-flex; align-items: center; gap: 5px; padding: 7px 8px; border: 0; border-radius: 8px; background: #eff8ef; color: #39754a; font-size: 9px; font-weight: 750; cursor: pointer; }
+.shortcut-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }.shortcut-card { display: flex; align-items: center; gap: 13px; min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: white; text-align: left; cursor: pointer; transition: border .2s, transform .2s, box-shadow .2s; }.shortcut-card:hover { transform: translateY(-2px); border-color: #cfe3d1; box-shadow: 0 7px 18px #263d3009; }.shortcut-icon { width: 44px; height: 44px; border-radius: 13px; }.shortcut-card > span:nth-child(2) { display: grid; min-width: 0; gap: 5px; flex: 1; }.shortcut-card strong { color: #36513c; font-size: 12px; }.shortcut-card small { color: #909b91; font-size: 10px; line-height: 1.6; }.shortcut-card > svg { flex: 0 0 auto; color: #9bab9d; }
+.modal-backdrop { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center; padding: 18px; overflow-y: auto; background: #172a1fc4; backdrop-filter: blur(6px); }.profile-modal, .reward-modal { position: relative; width: 100%; max-width: 470px; margin: auto; padding: 28px; border: 1px solid #e0ebe0; border-radius: 24px; background: #fff; box-shadow: 0 25px 80px #0d1f1333; animation: modal-in .2s ease-out; }.modal-close { position: absolute; top: 15px; right: 15px; display: grid; width: 35px; height: 35px; place-items: center; border: 0; border-radius: 11px; background: #f0f6f0; color: #5d7562; cursor: pointer; }.profile-modal-heading h2, .reward-modal h2 { margin: 7px 0; color: #2c4934; font-size: 21px; }.profile-modal-heading p, .reward-modal p { margin: 0; color: #849087; font-size: 11px; line-height: 1.8; }.avatar-editor { display: flex; align-items: center; gap: 15px; margin: 22px 0; padding: 15px; border: 1px solid #e7eee7; border-radius: 15px; background: #f8fbf8; }.avatar-preview { display: grid; width: 70px; height: 70px; flex: 0 0 auto; place-items: center; overflow: hidden; border: 3px solid white; border-radius: 50%; background: #dff0e1; color: #367549; box-shadow: 0 0 0 1px #cfe4d1; font-size: 22px; font-weight: 800; }.avatar-preview img { width: 100%; height: 100%; object-fit: cover; }.upload-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 11px; border: 1px solid #d7e8d9; border-radius: 10px; background: white; color: #3d794b; font-size: 10px; font-weight: 750; cursor: pointer; }.avatar-editor p { margin: 7px 0 0; color: #9aa39b; font-size: 9px; }.field-label { display: block; margin: 14px 0 7px; color: #506654; font-size: 11px; font-weight: 750; }.field-input { width: 100%; min-height: 43px; padding: 11px 12px; border: 1px solid #dfe9df; border-radius: 11px; outline: none; background: white; color: #304636; font-size: 12px; }.field-input:focus { border-color: #75ad80; box-shadow: 0 0 0 3px #e6f4e8; }.profile-error { color: #c24e4e; font-size: 10px; line-height: 1.7; }.save-profile { width: 100%; margin-top: 21px; }.reward-modal { max-width: 390px; text-align: center; }.reward-modal-emoji { display: grid; width: 66px; height: 66px; place-items: center; margin: 4px auto 16px; border-radius: 20px; background: #f0f8ed; font-size: 34px; }.modal-actions { display: flex; justify-content: center; gap: 10px; margin-top: 23px; }.toast { position: fixed; z-index: 1200; right: 22px; bottom: 22px; display: flex; align-items: center; gap: 11px; width: min(410px, calc(100vw - 32px)); padding: 15px; border: 1px solid #d6e9d7; border-radius: 15px; background: white; color: #3c794b; box-shadow: 0 12px 35px #1b35231c; animation: modal-in .2s ease-out; }.toast > span { flex: 1; color: #55725a; font-size: 11px; line-height: 1.7; }.toast button { display: grid; place-items: center; border: 0; background: transparent; color: #819084; cursor: pointer; }
+@keyframes wave { 0%, 100% { transform: rotate(0); } 15%, 30% { transform: rotate(13deg); } 45% { transform: rotate(-5deg); } 60% { transform: rotate(9deg); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes modal-in { from { opacity: 0; transform: translateY(9px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 1050px) { .hero { padding: 28px; grid-template-columns: minmax(0, 1fr) 270px; }.hero-art { transform: scale(.92); }.reading-card { grid-template-columns: 1fr; }.checkin-box { display: grid; grid-template-columns: auto 1fr; justify-items: start; column-gap: 13px; text-align: left; }.checkin-emoji { grid-row: span 2; }.checkin-box > strong { align-self: end; margin-top: 0; }.checkin-box > p { margin: 4px 0 0; }.checkin-btn { grid-column: 1 / -1; margin-top: 15px; }.checkin-message { grid-column: 1 / -1; } }
+@media (max-width: 760px) { .home-page { gap: 18px; padding: 3px; }.hero { grid-template-columns: minmax(0, 1fr); padding: 25px 22px 20px; border-radius: 21px; }.hero h1 { font-size: 27px; }.hero-art { min-height: 205px; margin-top: 8px; transform: scale(.9); }.bot-bubble { right: 0; bottom: 0; }.quick-stats { grid-template-columns: 1fr; gap: 10px; }.quick-stat { padding: 14px; }.quick-stat strong { font-size: 22px; }.reading-card { padding: 19px; gap: 18px; }.section-heading { align-items: flex-start; }.section-heading h2 { font-size: 16px; }.rewards-grid { grid-template-columns: 1fr; }.reward-card { grid-template-columns: 115px minmax(0, 1fr); }.reward-visual { min-height: 180px; }.reward-content { padding: 15px; }.books-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }.book-cover { min-height: 145px; padding: 13px; }.book-cover strong { font-size: 13px; }.book-info { padding: 11px; }.book-card-bottom { align-items: flex-start; flex-direction: column; }.shortcut-grid { grid-template-columns: 1fr; }.section-heading .link-button { max-width: 115px; } }
+@media (max-width: 420px) { .hero { padding: 22px 17px; }.hero h1 { font-size: 23px; }.hero-subtitle { font-size: 12px; }.hero-actions { flex-direction: column; align-items: stretch; }.hero-actions .btn { width: 100%; }.hero-art { transform: scale(.82); margin: -4px -10px -9px; }.bot-bubble { width: 205px; }.section-heading { flex-direction: column; align-items: flex-start; }.points-pill { align-self: flex-start; }.reward-card { grid-template-columns: 95px minmax(0, 1fr); }.reward-visual { min-height: 205px; }.reward-emoji { font-size: 40px; }.reward-content h3 { font-size: 13px; }.reward-bottom { align-items: flex-start; flex-direction: column; }.books-grid { gap: 9px; }.book-cover { min-height: 130px; }.cover-deco { font-size: 27px; }.book-cover strong { font-size: 12px; }.mini-action { font-size: 8px; }.profile-modal, .reward-modal { padding: 23px 19px; }.toast { right: 16px; bottom: 16px; } }
+@media (prefers-reduced-motion: reduce) { .home-page *, .home-page *::before, .home-page *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 </style>
