@@ -58,3 +58,15 @@ ADD COLUMN IF NOT EXISTS start_time TIMESTAMPTZ DEFAULT NOW();
 
 
 TRUNCATE TABLE admin_users RESTART IDENTITY CASCADE;
+
+-- ១. សម្អាតទិន្នន័យ admin_users ចាស់
+TRUNCATE TABLE admin_users RESTART IDENTITY CASCADE;
+
+-- ២. បញ្ចូលគណនី 'roth' ជាមួយ password 'povratha19@@2026' ដែលបាន hash រួចស្រេច
+INSERT INTO admin_users (username, display_name, password_salt, password_hash)
+VALUES (
+    'roth',
+    'roth',
+    'e7a4b8c91029384756abcdef12345678',
+    'd8f61537021ecba81b498f39567c9d09a4716b71382410a887b32f913d0859a164b1897b610c3d9735467027b6863c3d526e06b9868846c4f87747e06a38259b'
+);
