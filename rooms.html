@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Room Booking - Library Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Khmer:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- QRCode JS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0d1117',
+                        cardbg: '#161b22',
+                        cardborder: '#30363d',
+                        accent: '#6366f1',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans Khmer', sans-serif;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        html[lang="km"] body,
+        html[lang="km"] button,
+        html[lang="km"] input,
+        html[lang="km"] select,
+        html[lang="km"] textarea {
+            font-family: 'Noto Sans Khmer', 'Inter', sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
+        }
+
+        html.light-mode body {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        html.light-mode .bg-darkbg,
+        html.light-mode .bg-cardbg,
+        html.light-mode aside {
+            background-color: #ffffff;
+        }
+
+        html.light-mode .bg-darkbg\/80 {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        html.light-mode [class~="bg-[#11161d]"],
+        html.light-mode [class~="bg-[#161b22]"] {
+            background-color: #f8fafc;
+        }
+
+        html.light-mode [class~="bg-[#1f242d]"] {
+            background-color: #e5e7eb;
+        }
+
+        html.light-mode .text-white {
+            color: #111827;
+        }
+
+        html.light-mode .text-gray-100,
+        html.light-mode .text-gray-200,
+        html.light-mode .text-gray-300 {
+            color: #374151;
+        }
+
+        html.light-mode .text-gray-400,
+        html.light-mode .text-gray-500 {
+            color: #6b7280;
+        }
+
+        html.light-mode .border-cardborder {
+            border-color: #d1d5db;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+
+            #qr-modal,
+            #qr-modal * {
+                visibility: visible !important;
+            }
+
+            #qr-modal {
+                display: flex !important;
+                position: fixed !important;
+                inset: 0 !important;
+                background: #fff !important;
+                backdrop-filter: none !important;
+                color: #111827 !important;
+            }
+
+            #qr-modal>div {
+                background: #fff !important;
+                color: #111827 !important;
+                border: 0 !important;
+                box-shadow: none !important;
+            }
+
+            #qr-modal h3,
+            #qr-modal p {
+                color: #111827 !important;
+            }
+
+            .qr-modal-actions {
+                display: none !important;
+            }
+        }
+
+        #qr-modal.qr-modal-open {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #qr-modal {
+            overflow-y: auto;
+        }
+
+        #qr-modal > div {
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-darkbg text-gray-100 h-screen flex overflow-hidden selection:bg-indigo-500 selection:text-white">
+
+    <!-- Sidebar Navigation -->
+    <aside
+        class="w-72 bg-[#11161d] border-r border-[#21262d] flex flex-col justify-between shrink-0 transition-all duration-300 z-20">
+        <div>
+            <!-- Brand Logo -->
+            <div class="p-6 flex items-center space-x-3 border-b border-[#21262d]">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-book-open text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg tracking-wide text-white">Digital Library</h2>
+                    <p class="text-xs text-gray-400">Administration System</p>
+                </div>
+            </div>
+
+            <!-- Menu Items -->
+            <nav class="p-4 space-y-2">
+                <a href="dasboard.html"
+                    class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 text-gray-400 hover:bg-[#21262d] hover:text-white">
+                    <i class="fa-solid fa-house-chimney w-5 text-center"></i>
+                    <span>Home</span>
+                </a>
+                <a href="dasboard.html#borrow"
+                    class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 text-gray-400 hover:bg-[#21262d] hover:text-white">
+                    <i class="fa-solid fa-book-bookmark w-5 text-center"></i>
+                    <span>Book Borrowing</span>
+                </a>
+                <!-- Active Tab: Study Room Booking -->
+                <a href="rooms.html"
+                    class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-door-open w-5 text-center"></i>
+                    <span>Study Room Booking</span>
+                </a>
+                <a href="dasboard.html#audit"
+                    class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 text-gray-400 hover:bg-[#21262d] hover:text-white">
+                    <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+                    <span>System Audit</span>
+                </a>
+                <a href="setting.html"
+                    class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-medium transition-all duration-200 text-gray-400 hover:bg-[#21262d] hover:text-white">
+                    <i class="fa-solid fa-gear w-5 text-center"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-[#21262d]">
+            <div class="flex items-center space-x-3 p-2 bg-[#161b22] rounded-xl border border-[#30363d]">
+                <div
+                    class="w-9 h-9 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+                    AD
+                </div>
+                <div class="overflow-hidden">
+                    <p id="admin-display-name" class="text-sm font-semibold truncate text-white">Administrator</p>
+                    <p class="text-xs text-emerald-400 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                    </p>
+                </div>
+                <button onclick="logoutAdmin()"
+                    class="w-full mt-3 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:bg-rose-500/10 hover:text-rose-400 transition">
+                    <i class="fa-solid fa-right-from-bracket w-5 text-center"></i>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-darkbg">
+        <!-- Top Header Bar -->
+        <header
+            class="h-20 bg-darkbg/80 border-b border-[#21262d] px-8 flex justify-between items-center shrink-0 backdrop-blur-md">
+            <div class="text-xl font-bold text-white flex items-center gap-3">
+                <i class="fa-solid fa-door-open text-indigo-400"></i> Study Room Management
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="fetchRooms()"
+                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Room Management Content -->
+        <div class="flex-1 overflow-y-auto p-8 relative space-y-6">
+
+            <!-- 1. Room Status Legend -->
+            <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                <h3 class="text-base font-semibold mb-4 text-gray-200">Room Status Legend</h3>
+                <div class="flex flex-wrap gap-6 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3.5 h-3.5 bg-emerald-500 rounded-full shadow-md shadow-emerald-500/50"></span>
+                        <span class="text-gray-300">Available</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3.5 h-3.5 bg-amber-400 rounded-full shadow-md shadow-amber-400/50"></span>
+                        <span class="text-gray-300">Reserved</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3.5 h-3.5 bg-rose-500 rounded-full shadow-md shadow-rose-500/50"></span>
+                        <span class="text-gray-300">Occupied</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Stats Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Total Rooms Card -->
+                <div
+                    class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Total Rooms</p>
+                        <h3 id="stat-total-rooms" class="text-3xl font-bold text-white">0</h3>
+                    </div>
+                    <div
+                        class="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center text-amber-400 text-xl font-bold">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                </div>
+                <!-- Usage Rate Card -->
+                <div
+                    class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Usage Rate</p>
+                        <h3 id="stat-usage-rate" class="text-3xl font-bold text-white">0%</h3>
+                    </div>
+                    <div
+                        class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400 text-xl font-bold">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Rooms Cards Grid -->
+            <div class="bg-cardbg border border-cardborder p-6 rounded-2xl shadow-lg">
+                <h3 class="text-lg font-semibold mb-4 text-white">Select a Room to Manage</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="rooms-grid">
+                    <p class="col-span-full text-sm text-gray-400">Loading rooms from the database...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast"
+        class="fixed bottom-6 right-6 bg-[#1f242d] border border-cardborder text-white px-5 py-3 rounded-xl shadow-2xl z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg" class="text-sm font-medium">Operation completed successfully!</span>
+    </div>
+
+    <!-- JavaScript Logic & API Communication -->
+    <script src="auth.js"></script>
+    <script src="/preferences.js"></script>
+    <script>
+        const API_URL = '/api/rooms';
+        let rooms = [];
+        let qrcodeInstance = null;
+
+        async function bookRoom(roomId, studentName, hours = 2) {
+            try {
+                const response = await fetchWithTimeout('/api/rooms/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        roomId,
+                        studentName,
+                        durationHours: hours
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    showToast(data.error || 'Unable to book the room.', true);
+                    return;
+                }
+
+                showToast(data.message || 'Room booked successfully.');
+                await fetchRooms();
+            } catch (error) {
+                console.error('Room booking error:', error);
+                showToast('បរាជ័យក្នុងការកក់បន្ទប់!', true);
+            }
+        }
+
+        // Fetch room data from the database
+        async function fetchRooms() {
+            const grid = document.getElementById('rooms-grid');
+            grid.innerHTML = '<p class="col-span-full text-sm text-gray-400">Loading rooms from the database...</p>';
+
+            try {
+                const response = await fetchWithTimeout(API_URL, { credentials: 'same-origin' });
+                if (response.status === 401) {
+                    window.location.replace('/login.html');
+                    return;
+                }
+                if (!response.ok) {
+                    const responseBody = await response.text();
+                    let errorMessage = `Room request failed (${response.status}).`;
+                    if (responseBody) {
+                        try {
+                            errorMessage = JSON.parse(responseBody).error || errorMessage;
+                        } catch {
+                            errorMessage = responseBody;
+                        }
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                if (!Array.isArray(data)) throw new Error('The rooms API returned an invalid response.');
+                rooms = data;
+                renderRooms();
+                updateStats();
+                if (rooms.length === 0) {
+                    grid.innerHTML = '<p class="col-span-full text-sm text-gray-400">No rooms were found in the database.</p>';
+                } else {
+                    showToast('Room data loaded successfully!');
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                grid.innerHTML = '<p class="col-span-full text-sm text-rose-400">Unable to load rooms. Open this page through the Library System server and check that it is running.</p>';
+                showToast(error.message || 'Unable to load room data from the database.');
+            }
+        }
+
+        // Calculate and display room statistics
+        function updateStats() {
+            const total = rooms.length;
+            document.getElementById('stat-total-rooms').innerText = total;
+
+            if (total === 0) {
+                document.getElementById('stat-usage-rate').innerText = '0%';
+                return;
+            }
+
+            // Count reserved and occupied rooms
+            const used = rooms.filter(r => r.status.toLowerCase() === 'occupied' || r.status.toLowerCase() === 'reserved').length;
+            const percentage = Math.round((used / total) * 100);
+            document.getElementById('stat-usage-rate').innerText = `${percentage}%`;
+        }
+
+        function formatElapsedTime(startTime) {
+            const language = localStorage.getItem('admin-language') === 'km' ? 'km' : 'en';
+            const justStartedText = language === 'km' ? 'ទើបតែចាប់ផ្ដើម' : 'Just started';
+            if (!startTime) return justStartedText;
+
+            const start = new Date(startTime);
+            if (Number.isNaN(start.getTime())) return justStartedText;
+
+            const diffMs = Date.now() - start.getTime();
+            if (diffMs < 0) {
+                return justStartedText;
+            }
+
+            const diffMinutes = Math.floor(diffMs / 60000);
+            const hours = Math.floor(diffMinutes / 60);
+            const minutes = diffMinutes % 60;
+
+            if (language === 'km') {
+                return hours > 0 ? `${hours} ម៉ោង ${minutes} នាទី` : `${minutes} នាទី`;
+            }
+            return hours > 0 ? `${hours} hr ${minutes} min` : `${minutes} min`;
+        }
+
+        // Render each room card
+        function renderRooms() {
+            const grid = document.getElementById('rooms-grid');
+            grid.innerHTML = rooms.map(room => {
+                const st = (room.status || '').toLowerCase();
+                let statusColor = 'border-emerald-500/40 bg-emerald-500/5 text-emerald-400';
+                let dotColor = 'bg-emerald-500 shadow-emerald-500';
+                let statusText = 'Available';
+
+                if (st === 'reserved') {
+                    statusColor = 'border-amber-500/40 bg-amber-500/5 text-amber-400';
+                    dotColor = 'bg-amber-400 shadow-amber-400';
+                    statusText = 'Reserved';
+                } else if (st === 'occupied') {
+                    statusColor = 'border-rose-500/40 bg-rose-500/5 text-rose-400';
+                    dotColor = 'bg-rose-500 shadow-rose-500';
+                    statusText = 'Occupied';
+                }
+
+                const safeRoomName = escapeHTML(room.name);
+                const safeUserName = escapeHTML(room.user || '');
+                const timeBadge = st === 'reserved' || st === 'occupied'
+                    ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#161b22] border border-[#30363d] text-gray-300 inline-flex items-center gap-1 shadow-sm"><i class="fa-regular fa-clock text-indigo-400"></i>${formatElapsedTime(room.start_time)}</span>`
+                    : '';
+                return `
+                    <div class="bg-[#11161d] border ${statusColor} p-4 rounded-2xl shadow-md flex flex-col justify-between h-36">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-white text-base">${safeRoomName}</span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="showQRCode(${Number(room.id)}, this.dataset.roomName)" data-room-name="${safeRoomName}" title="Show Check-in QR Code" class="p-2 bg-[#161b22] hover:bg-indigo-600 text-gray-300 hover:text-white rounded-lg text-xs transition border border-[#30363d]" aria-label="Show Check-in QR Code">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </button>
+                                <span class="w-2.5 h-2.5 rounded-full ${dotColor} shadow-sm"></span>
+                            </div>
+                        </div>
+                        <div onclick="toggleRoomStatus(${Number(room.id)})" class="cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <p class="text-xs font-semibold">${statusText}</p>
+                                ${timeBadge}
+                            </div>
+                            <p class="text-xs text-gray-400 truncate mt-1">${safeUserName ? 'User: ' + safeUserName : 'No user assigned'}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        setInterval(() => {
+            if (rooms.length > 0) renderRooms();
+        }, 30000);
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        function showQRCode(roomId, roomName) {
+            document.getElementById('qr-modal-title').innerText = `QR Code: ${roomName}`;
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = '';
+
+            // 👉 ប្រើប្រាស់តំណភ្ជាប់ Ngrok នេះ
+            const baseUrl = 'https://condiment-borough-city.ngrok-free.dev';
+
+            const checkinUrl = `${baseUrl}/checkin.html?roomId=${roomId}&name=${encodeURIComponent(roomName)}`;
+
+            qrcodeInstance = new QRCode(container, {
+                text: checkinUrl,
+                width: 180,
+                height: 180,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            const modal = document.getElementById('qr-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('qr-modal-open');
+        }
+
+        function closeQRModal() {
+            const modal = document.getElementById('qr-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('qr-modal-open');
+            qrcodeInstance = null;
+        }
+
+        // Toggle the room status and sync the change to the database
+        async function toggleRoomStatus(roomId) {
+            const room = rooms.find(r => r.id === roomId);
+            if (!room) return;
+
+            let nextStatus = 'available';
+            let nextUser = null;
+
+            const st = (room.status || '').toLowerCase();
+            if (st === 'available') {
+                nextStatus = 'reserved';
+                nextUser = 'Guest Student';
+            } else if (st === 'reserved') {
+                nextStatus = 'occupied';
+                nextUser = room.user || 'Guest Student';
+            } else {
+                nextStatus = 'available';
+                nextUser = null;
+            }
+
+            try {
+                const response = await fetchWithTimeout(`${API_URL}/${roomId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: nextStatus, user: nextUser })
+                });
+
+                if (response.status === 401) {
+                    window.location.replace('/login.html');
+                    return;
+                }
+                if (!response.ok) throw new Error('Update failed');
+
+                const updated = await response.json();
+                room.status = updated.status;
+                room.user = updated.user;
+                renderRooms();
+                updateStats();
+                showToast(`Updated the status of ${room.name} successfully.`);
+            } catch (error) {
+                console.error('Update error:', error);
+                showToast('Failed to update the room status.');
+            }
+        }
+
+        // Toast Message Notification
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            document.getElementById('toast-msg').innerText = msg;
+            icon.className = isError
+                ? 'fa-solid fa-circle-xmark text-rose-400'
+                : 'fa-solid fa-circle-check text-emerald-400';
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        async function initializeRoomsPage() {
+            try {
+                const admin = await checkAdminSession();
+                if (!admin) return;
+                document.documentElement.classList.toggle('light-mode', localStorage.getItem('admin-theme') === 'light');
+                document.getElementById('admin-display-name').textContent = admin.displayName;
+                await fetchRooms();
+            } catch (error) {
+                console.error('Room page initialization error:', error);
+                const grid = document.getElementById('rooms-grid');
+                grid.innerHTML = '<p class="col-span-full text-sm text-rose-400">Could not connect to the Library System server. Open http://localhost:3000/rooms.html and sign in again.</p>';
+                showToast(error.name === 'AbortError'
+                    ? 'The server did not respond in time. Check that it is running.'
+                    : error.message || 'Unable to verify your admin session.');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', initializeRoomsPage);
+    </script>
+    <!-- Modal បង្ហាញ QR Code -->
+    <div id="qr-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden p-4"
+        role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
+        <div
+            class="bg-[#161b22] border border-[#30363d] w-full max-w-sm rounded-2xl p-6 shadow-2xl text-center relative">
+            <button type="button" onclick="closeQRModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg" aria-label="Close">✕</button>
+            <h3 id="qr-modal-title" class="text-lg font-bold text-white mb-2">Room QR Code</h3>
+            <p class="text-xs text-gray-400 mb-4">Scan this QR Code to check in to the room.</p>
+            <div id="qrcode-container" class="bg-white p-4 rounded-xl inline-block shadow-md mb-4"></div>
+            <div class="qr-modal-actions flex justify-center gap-3">
+                <button type="button" onclick="window.print()"
+                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-print"></i> Print QR Code
+                </button>
+                <button type="button" onclick="closeQRModal()"
+                    class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-xs">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

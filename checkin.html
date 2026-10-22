@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="km" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in បន្ទប់សិក្សា</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { color-scheme: dark; }
+        body {
+            font-family: 'Inter', 'Kantumruy Pro', sans-serif;
+            background:
+                radial-gradient(ellipse at 15% 10%, rgba(99, 102, 241, 0.2), transparent 38%),
+                radial-gradient(ellipse at 90% 85%, rgba(14, 165, 233, 0.12), transparent 35%),
+                #0d1117;
+        }
+        button, input { font: inherit; }
+        html[lang="km"] body,
+        html[lang="km"] button,
+        html[lang="km"] input { font-family: 'Kantumruy Pro', 'Inter', sans-serif; }
+        .checkin-card { animation: rise-in 450ms ease-out both; }
+        @keyframes rise-in {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex items-center justify-center p-5 sm:p-6">
+    <main class="w-full max-w-md">
+        <div class="flex items-center justify-center gap-2 mb-5 text-xs font-semibold tracking-wide text-gray-400">
+            <i class="fa-solid fa-book-open text-indigo-400"></i>
+            <span>LIBRARY STUDY ROOMS</span>
+        </div>
+
+        <section class="checkin-card relative overflow-hidden bg-[#161b22]/95 border border-white/10 w-full rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/40 text-center backdrop-blur-xl">
+            <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-sky-400"></div>
+            <div class="w-[4.5rem] h-[4.5rem] bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 rounded-2xl flex items-center justify-center mx-auto mb-5 text-2xl shadow-lg shadow-indigo-950/30">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+            <p class="text-[11px] uppercase tracking-[0.2em] font-semibold text-indigo-300 mb-2">Room check-in</p>
+            <h1 id="room-display" class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">បន្ទប់សិក្សា</h1>
+            <p class="text-sm leading-6 text-gray-400 mb-7">ស្កេន Check-in ដើម្បីបញ្ជាក់ការចូលប្រើប្រាស់បន្ទប់</p>
+
+            <form id="checkin-form" onsubmit="submitCheckin(event)" class="space-y-5 text-left">
+                <div>
+                    <label for="student-name" class="block text-sm font-medium text-gray-200 mb-2">ឈ្មោះសិស្ស / ក្រុម</label>
+                    <div class="relative">
+                        <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="student-name" required maxlength="100" autocomplete="name" placeholder="ឧ. Pov Ratha" class="w-full bg-[#0d1117] border border-[#30363d] rounded-xl pl-11 pr-4 py-3.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 transition">
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 rounded-xl bg-sky-500/[0.06] border border-sky-400/10 p-3.5 text-left">
+                    <i class="fa-solid fa-location-dot text-sky-400 mt-0.5"></i>
+                    <p class="text-xs leading-5 text-gray-400">សូមអនុញ្ញាតឲ្យប្រើទីតាំង (Location) ដើម្បីផ្ទៀងផ្ទាត់ការចូលប្រើប្រាស់បន្ទប់។</p>
+                </div>
+                <button type="submit" id="btn-submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:scale-[0.99] text-white rounded-xl font-semibold shadow-lg shadow-indigo-950/40 transition-all focus:outline-none focus:ring-4 focus:ring-indigo-400/30 disabled:opacity-60 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-location-crosshairs mr-2"></i><span id="btn-label">បញ្ជាក់ការចូលប្រើ (Check-in)</span>
+                </button>
+            </form>
+
+            <div id="status-box" class="hidden mt-5 p-4 rounded-xl text-sm leading-6 text-left" role="status" aria-live="polite"></div>
+            <p class="text-[11px] text-gray-600 mt-6"><i class="fa-solid fa-shield-halved mr-1"></i> Secure room access verification</p>
+        </section>
+    </main>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('roomId');
+        const roomName = urlParams.get('name') || `Room ${roomId}`;
+        document.getElementById('room-display').innerText = roomName;
+
+        async function submitCheckin(e) {
+            e.preventDefault();
+            const studentName = document.getElementById('student-name').value.trim();
+            const btn = document.getElementById('btn-submit');
+            const btnLabel = document.getElementById('btn-label');
+
+            if (!navigator.geolocation) {
+                showCheckinStatus('ឧបករណ៍របស់អ្នកមិនគាំទ្រ GPS ទេ!', false);
+                return;
+            }
+
+            btn.disabled = true;
+            btnLabel.innerText = 'កំពុងផ្ទៀងផ្ទាត់ GPS ទីតាំង...';
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+
+                    btnLabel.innerText = 'កំពុងដំណើរការ Check-in...';
+
+                    try {
+                        const res = await fetch('/api/rooms/checkin', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ roomId, studentName, userLat, userLon })
+                        });
+
+                        const data = await res.json();
+                        if (res.ok) {
+                            showCheckinStatus('✅ ' + data.message, true);
+                            document.getElementById('checkin-form').classList.add('hidden');
+                        } else {
+                            showCheckinStatus('❌ ' + data.error, false);
+                            btn.disabled = false;
+                            btnLabel.innerText = 'បញ្ជាក់ការចូលប្រើ (Check-in)';
+                        }
+                    } catch (err) {
+                        showCheckinStatus('❌ បរាជ័យក្នុងការតភ្ជាប់ទៅ Server!', false);
+                        btn.disabled = false;
+                        btnLabel.innerText = 'បញ្ជាក់ការចូលប្រើ (Check-in)';
+                    }
+                },
+                (error) => {
+                    btn.disabled = false;
+                    btnLabel.innerText = 'បញ្ជាក់ការចូលប្រើ (Check-in)';
+                    showCheckinStatus('❌ សូម Allow Location Permission លើទូរស័ព្ទរបស់អ្នកជាមុនសិន!', false);
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        function showCheckinStatus(message, isSuccess) {
+            const statusBox = document.getElementById('status-box');
+            statusBox.className = isSuccess
+                ? 'mt-5 p-4 rounded-xl text-sm leading-6 text-left bg-emerald-500/10 text-emerald-300 border border-emerald-400/20'
+                : 'mt-5 p-4 rounded-xl text-sm leading-6 text-left bg-rose-500/10 text-rose-300 border border-rose-400/20';
+            statusBox.innerText = message;
+            statusBox.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
