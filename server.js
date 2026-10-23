@@ -7,7 +7,9 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const pool = require('./db');
 
+// =================== ដំណាក់កាលទី ១: កំណត់ Express App ====================
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 const scrypt = promisify(crypto.scrypt);
 const SESSION_COOKIE = 'library_admin_session';
@@ -30,7 +32,6 @@ app.use((req, res, next) => {
   res.setHeader('ngrok-skip-browser-warning', 'true');
   next();
 });
-
 function getSessionToken(req) {
   const rawCookie = req.headers.cookie;
   if (!rawCookie) return null;
@@ -82,6 +83,24 @@ async function initializeAuth() {
       admin_id INTEGER NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
       expires_at TIMESTAMPTZ NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    
+    -- 📚 បន្ថែម Table របស់បងត្រង់នេះ
+    CREATE TABLE IF NOT EXISTS book_loans (
+      id SERIAL PRIMARY KEY,
+      book_code VARCHAR(50) NOT NULL,
+      book_title VARCHAR(255) NOT NULL,
+      student_name VARCHAR(255) NOT NULL,
+      status VARCHAR(50) DEFAULT 'កំពុងខ្ចី',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    
+    CREATE TABLE IF NOT EXISTS student_rewards (
+      id SERIAL PRIMARY KEY,
+      student_name VARCHAR(255) NOT NULL UNIQUE,
+      points INT DEFAULT 0,
+      rewards_earned INT DEFAULT 0,
+      updated_at TIMESTAMPTZ DEFAULT NOW()
     );
   `);
 
@@ -148,7 +167,7 @@ function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a = Math.sin(dLat / 2) ** 2 +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
   return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
@@ -225,9 +244,9 @@ app.post('/api/rooms/book', async (req, res) => {
       WHERE id = $4 RETURNING *
     `, [studentName.trim(), startTime, endTime, roomId]);
 
-    res.json({ 
-      message: `បានកក់បន្ទប់ ${result.rows[0].name} ជោគជ័យ! សូមទៅស្កេន Check-in ក្នុងរង្វង់ ១៥ នាទី។`, 
-      room: result.rows[0] 
+    res.json({
+      message: `បានកក់បន្ទប់ ${result.rows[0].name} ជោគជ័យ! សូមទៅស្កេន Check-in ក្នុងរង្វង់ ១៥ នាទី។`,
+      room: result.rows[0]
     });
   } catch (err) {
     res.status(500).json({ error: 'បរាជ័យក្នុងការកក់បន្ទប់' });
@@ -255,8 +274,8 @@ app.post('/api/rooms/checkin', async (req, res) => {
     if (room.latitude && room.longitude) {
       const distance = calculateDistanceInMeters(room.latitude, room.longitude, userLat, userLon);
       if (distance > 25) {
-        return res.status(403).json({ 
-          error: `អ្នកនៅឆ្ងាយពីបន្ទប់ពេក (${Math.round(distance)} ម៉ែត្រ)! សូមទៅដល់មុខបន្ទប់ដើម្បីស្កេន។` 
+        return res.status(403).json({
+          error: `អ្នកនៅឆ្ងាយពីបន្ទប់ពេក (${Math.round(distance)} ម៉ែត្រ)! សូមទៅដល់មុខបន្ទប់ដើម្បីស្កេន។`
         });
       }
     }
@@ -464,3 +483,15 @@ initializeAuth()
     console.error('Server startup error:', err.message);
     process.exitCode = 1;
   });
+
+
+// =========================================================================
+// ==================== 📚 SOT MOUYCHHENG: BOOK BORROWING & REWARDS=========
+// =========================================================================
+
+// 📚 Book borrowing & rewards (admin only)
+const borrowRoutes = require('./src/borrowRoutes');
+app.use('/api/borrow', requireAdmin, borrowRoutes);
+
+const rewardRoutes = require('./src/rewardRoutes');
+app.use('/api/rewards', requireAdmin, rewardRoutes);

@@ -70,3 +70,27 @@ VALUES (
     'e7a4b8c91029384756abcdef12345678',
     'd8f61537021ecba81b498f39567c9d09a4716b71382410a887b32f913d0859a164b1897b610c3d9735467027b6863c3d526e06b9868846c4f87747e06a38259b'
 );
+
+
+
+// =========================================================================
+// ==================== 📚 SOT MOUYCHHENG: BOOK BORROWING & REWARDS=========
+// =========================================================================
+-- ១. បង្កើត Table សម្រាប់កត់ត្រាការខ្ចីសៀវភៅ
+CREATE TABLE IF NOT EXISTS book_loans (
+    id SERIAL PRIMARY KEY,
+    book_code VARCHAR(50) NOT NULL,
+    book_title VARCHAR(255) NOT NULL,
+    student_name VARCHAR(100) NOT NULL,
+    borrow_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    status VARCHAR(50) NOT NULL DEFAULT 'Borrowed'
+);
+
+-- ២. បង្កើត Table សម្រាប់គ្រប់គ្រងពិន្ទុរង្វាន់
+CREATE TABLE IF NOT EXISTS student_rewards (
+    id SERIAL PRIMARY KEY,
+    student_name VARCHAR(100) NOT NULL UNIQUE,
+    points INTEGER NOT NULL DEFAULT 0,
+    rewards_earned VARCHAR(255),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
