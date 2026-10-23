@@ -216,7 +216,6 @@ export const translations = {
 	'សរុប': 'Total',
 	'ត្រឡប់ទៅបញ្ជីសៀវភៅ': 'Back to catalog',
 	'មើលការកក់របស់ខ្ញុំ': 'View my holds',
-	'សេវាកម្មបណ្ណាល័យ Leafline': 'Leafline Library Services',
 	'រៀនដោយរីករាយ រីកចម្រើនជាមួយគ្នា': 'Learn happily and grow together',
 	'ថ្ងៃអាទិត្យ': 'Sunday',
 	'ថ្ងៃចន្ទ': 'Monday',

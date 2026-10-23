@@ -21,7 +21,7 @@
           <span class="welcome-bot-spark spark-two">✧</span>
         </div>
         <div class="welcome-bot-copy">
-          <span class="welcome-bot-kicker"><span class="welcome-online-dot"></span> LEAFLINE AI ASSISTANT</span>
+          <span class="welcome-bot-kicker"><span class="welcome-online-dot"></span> LIBRARY ASSISTANT</span>
           <h2>សួស្តី! សូមស្វាគមន៍មកកាន់បណ្ណាល័យ 💚</h2>
           <p>ខ្ញុំជា Bot ជំនួយការ។ ខ្ញុំនឹងចង្អុលបង្ហាញអ្នកមួយជំហានម្ដងៗ ដើម្បីជ្រើសរើសបន្ទប់ និងកក់ម៉ោងដែលអ្នកត្រូវការ។</p>
           <div class="welcome-bot-actions">
@@ -223,7 +223,7 @@
             <span class="bot-avatar">🤖</span>
             <div>
               <strong>ជំនួយការកក់បន្ទប់</strong>
-              <small>Leafline Library · ជួយណែនាំអ្នក</small>
+              <small>ជំនួយណែនាំអ្នក</small>
             </div>
             <button class="bot-close" aria-label="បិទជំនួយ" @click="helpOpen = false"><X :size="17" /></button>
           </header>

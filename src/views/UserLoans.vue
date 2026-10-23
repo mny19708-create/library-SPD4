@@ -4,7 +4,7 @@ code = r'''<template>
   <main class="loans-page" v-translate="locale" :data-locale="locale">
     <header class="page-header">
       <div>
-        <span class="eyebrow"><span class="leaf-icon">🌿</span> LEAFLINE LIBRARY</span>
+        <span class="eyebrow"><span class="leaf-icon">🌿</span> LIBRARY</span>
         <h1>សៀវភៅរបស់ខ្ញុំ 📚</h1>
         <p>គ្រប់គ្រងការកក់ ការខ្ចី និងពេលវេលាត្រូវសងសៀវភៅ។</p>
       </div>
@@ -46,7 +46,7 @@ code = r'''<template>
       </div>
       <div v-if="activeHolds.length" class="book-list">
         <article v-for="hold in activeHolds" :key="hold.bookId" class="book-card">
-          <div class="book-cover" :class="coverClass(hold)"><span class="cover-decoration">✦</span><span class="cover-emoji">📚</span><small>LEAFLINE</small></div>
+          <div class="book-cover" :class="coverClass(hold)"><span class="cover-decoration">✦</span><span class="cover-emoji">📚</span><small>BOOK</small></div>
           <div class="book-details">
             <span class="status-badge badge-hold"><i></i> បានកក់</span>
             <h3 data-no-translate>{{ hold.title }}</h3>
@@ -82,7 +82,7 @@ code = r'''<template>
       </div>
       <div v-if="activeLoans.length" class="book-list">
         <article v-for="loan in activeLoans" :key="loan.id" class="book-card">
-          <div class="book-cover" :class="coverClass(loan)"><span class="cover-decoration">✦</span><span class="cover-emoji">📖</span><small>LEAFLINE</small></div>
+          <div class="book-cover" :class="coverClass(loan)"><span class="cover-decoration">✦</span><span class="cover-emoji">📖</span><small>BOOK</small></div>
           <div class="book-details">
             <span class="status-badge" :class="loanStatusClass(loan)"><i></i>{{ loanStatus(loan) }}</span>
             <h3 data-no-translate>{{ loan.title }}</h3>
@@ -110,7 +110,7 @@ code = r'''<template>
       </div>
       <div v-if="returnedLoans.length" class="book-list">
         <article v-for="loan in returnedLoans" :key="loan.id" class="book-card returned-card">
-          <div class="book-cover cover-returned"><span class="cover-emoji">📗</span><small>LEAFLINE</small></div>
+          <div class="book-cover cover-returned"><span class="cover-emoji">📗</span><small>BOOK</small></div>
           <div class="book-details">
             <span class="status-badge badge-returned">✓ បានសងរួច</span>
             <h3 data-no-translate>{{ loan.title }}</h3>
@@ -132,7 +132,7 @@ code = r'''<template>
         <section class="return-modal" role="dialog" aria-modal="true" aria-labelledby="return-title">
           <button class="modal-close" type="button" aria-label="បិទ" :disabled="!!busyId" @click="closeReturnModal">×</button>
           <div class="modal-illustration">📚</div>
-          <span class="modal-eyebrow">LEAFLINE LIBRARY 🌿</span>
+          <span class="modal-eyebrow">LIBRARY 🌿</span>
           <h2 id="return-title">តើអ្នកពិតជាចង់សងសៀវភៅមែនទេ?</h2>
           <p class="modal-description">សូមពិនិត្យព័ត៌មានសៀវភៅមុនពេលបញ្ជាក់ការសង។</p>
           <div class="return-book-info">
@@ -155,9 +155,9 @@ code = r'''<template>
           <button class="modal-close" type="button" aria-label="បិទ" @click="closeThankYou">×</button>
           <div class="thankyou-decoration">🌿 ✨ 🌷</div>
           <div class="thankyou-icon">🤖</div>
-          <span class="modal-eyebrow">YOUR LEAFLINE READING FRIEND</span>
+          <span class="modal-eyebrow">YOUR READING FRIEND</span>
           <h2 id="thankyou-title">អរគុណដែលបានអានជាមួយយើង! 💚</h2>
-          <p>សៀវភៅត្រូវបានសងដោយជោគជ័យ។ អរគុណដែលបានមកកាន់ Leafline Library។ សូមអញ្ជើញមកម្ដងទៀតនៅថ្ងៃក្រោយ ដើម្បីខ្ចីសៀវភៅថ្មីៗ និងបន្តដំណើរអានដ៏រីករាយជាមួយយើង! 📚</p>
+          <p>សៀវភៅត្រូវបានសងដោយជោគជ័យ។ អរគុណដែលបានប្រើប្រាស់បណ្ណាល័យ។ សូមអញ្ជើញមកម្ដងទៀតនៅថ្ងៃក្រោយ ដើម្បីខ្ចីសៀវភៅថ្មីៗ និងបន្តដំណើរអានដ៏រីករាយជាមួយយើង! 📚</p>
           <div class="thankyou-note">🌱 សៀវភៅល្អៗ កំពុងរង់ចាំអ្នក!</div>
           <button class="thankyou-button" type="button" @click="closeThankYou(); navigateCatalog()">🌷 ស្វែងរកសៀវភៅថ្មី</button>
           <button class="thankyou-secondary" type="button" @click="closeThankYou">ត្រឡប់ទៅប្រវត្តិសង</button>

@@ -281,7 +281,7 @@
                 class="cancel-button"
                 @click="closeProfile"
               >
-                បោះបង់
+                បិទ
               </button>
 
               <button type="submit" class="save-button" :disabled="saving">
@@ -510,7 +510,7 @@ function saveProfile() {
     Object.assign(profile, next);
     Object.assign(draft, next);
 
-    closeProfile();
+    profileSuccess.value = 'រក្សាទុកព័ត៌មាន Profile បានជោគជ័យ! ✨';
   } catch (error) {
     console.error('Unable to save profile:', error);
     profileError.value =

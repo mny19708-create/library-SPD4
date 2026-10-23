@@ -2,7 +2,7 @@
   <div class="catalog-page" v-translate="locale" :data-locale="locale">
     <header class="hero">
       <div class="hero-content">
-        <div class="welcome-badge"><span>✨</span> Welcome to Leafline Library</div>
+        <div class="welcome-badge"><span>✨</span> Welcome to the library</div>
         <h1>ស្វែងរកសៀវភៅដែលអ្នកស្រឡាញ់ <span>📚</span></h1>
         <p>រកឃើញចំណេះដឹងថ្មីៗ និងសៀវភៅល្អៗ ដែលកំពុងរង់ចាំអ្នកនៅទីនេះ។</p>
         <div class="hero-actions">
@@ -80,7 +80,7 @@
     <section class="book-grid" aria-label="បញ្ជីសៀវភៅ">
       <article v-for="(book, index) in filteredBooks" :key="book.id" class="book-card">
         <div class="book-cover" :class="`cover-${Number(book.cover ?? index) % 4}`">
-          <span class="cover-top">✦ LEAFLINE LIBRARY ✦</span><span class="cover-decoration">✿</span>
+          <span class="cover-top">✦ LIBRARY ✦</span><span class="cover-decoration">✿</span>
           <span class="cover-title" data-no-translate>{{ book.coverTitle ?? book.title }}</span><span class="cover-author" data-no-translate>{{ book.author }}</span>
           <span class="cover-spine"></span><span class="cover-sticker">BOOK<br />LOVE</span>
         </div>

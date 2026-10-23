@@ -3,7 +3,7 @@
     <!-- Hero: user-facing only -->
     <section class="hero">
       <div class="hero-copy">
-        <span class="eyebrow"><span class="eyebrow-dot"></span> LEAFLINE DIGITAL LIBRARY</span>
+        <span class="eyebrow"><span class="eyebrow-dot"></span> DIGITAL LIBRARY</span>
         <h1>សួស្ដី{{ userName ? ` ${userName}` : '' }}! <span class="wave">👋</span></h1>
         <p class="hero-subtitle">រីករាយដែលបានជួបអ្នកម្ដងទៀត។ ថ្ងៃនេះតោះមកស្វែងរកសៀវភៅល្អៗ និងបង្កើនចំណេះដឹងជាមួយគ្នា។</p>
         <div class="hero-actions">
@@ -129,29 +129,9 @@
         <button class="shortcut-card" @click="navigateTo('catalog')"><span class="shortcut-icon mint"><BookOpen :size="22" /></span><span><strong>ស្វែងរកសៀវភៅ</strong><small>ស្វែងរកតាមចំណងជើង និងប្រភេទ</small></span><ChevronRight :size="19" /></button>
         <button class="shortcut-card" @click="navigateTo('loans')"><span class="shortcut-icon peach"><BookmarkCheck :size="22" /></span><span><strong>សៀវភៅដែលខ្ញុំខ្ចី</strong><small>ពិនិត្យសំណើ និងស្ថានភាពខ្ចី</small></span><ChevronRight :size="19" /></button>
         <button class="shortcut-card" @click="navigateTo('rooms')"><span class="shortcut-icon blue"><Armchair :size="22" /></span><span><strong>កក់បន្ទប់សិក្សា</strong><small>ស្វែងរកកន្លែងសិក្សារបស់អ្នក</small></span><ChevronRight :size="19" /></button>
-        <button class="shortcut-card" @click="openProfile"><span class="shortcut-icon lilac"><UserRound :size="22" /></span><span><strong>Profile របស់ខ្ញុំ</strong><small>កែព័ត៌មាន និងរូបភាពផ្ទាល់ខ្លួន</small></span><ChevronRight :size="19" /></button>
+        <button class="shortcut-card" @click="$emit('edit-profile')"><span class="shortcut-icon lilac"><UserRound :size="22" /></span><span><strong>Profile របស់ខ្ញុំ</strong><small>កែព័ត៌មាន និងរូបភាពផ្ទាល់ខ្លួន</small></span><ChevronRight :size="19" /></button>
       </div>
     </section>
-
-    <!-- Profile edit modal -->
-    <div v-if="profileOpen" class="modal-backdrop" @click.self="profileOpen = false">
-      <section class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-title">
-        <button class="modal-close" @click="profileOpen = false" aria-label="បិទ"><X :size="20" /></button>
-        <div class="profile-modal-heading"><span class="section-kicker">YOUR PERSONAL SPACE</span><h2 id="profile-title">កែ Profile របស់អ្នក 👤</h2><p>ព័ត៌មាននេះប្រើសម្រាប់ស្វាគមន៍អ្នកនៅលើទំព័រ Home។</p></div>
-        <div class="avatar-editor">
-          <div class="avatar-preview">
-            <img v-if="profileDraft.avatar" :src="profileDraft.avatar" alt="រូប Profile" />
-            <span v-else>{{ initials(profileDraft.fullName) }}</span>
-          </div>
-          <div><label class="upload-btn"><Camera :size="16" /> ប្ដូររូប Profile<input type="file" accept="image/*" @change="handleAvatar" hidden /></label><p>PNG, JPG ឬ WEBP · មិនលើស 2MB</p></div>
-        </div>
-        <label class="field-label" for="profile-name">ឈ្មោះពេញ</label><input id="profile-name" v-model.trim="profileDraft.fullName" class="field-input" placeholder="បញ្ចូលឈ្មោះរបស់អ្នក" />
-        <label class="field-label" for="profile-email">អ៊ីមែល</label><input id="profile-email" v-model.trim="profileDraft.email" class="field-input" type="email" placeholder="example@email.com" />
-        <label class="field-label" for="profile-phone">លេខទូរស័ព្ទ</label><input id="profile-phone" v-model.trim="profileDraft.phone" class="field-input" type="tel" placeholder="បញ្ចូលលេខទូរស័ព្ទ" />
-        <p v-if="profileError" class="profile-error">{{ profileError }}</p>
-        <button class="btn btn-primary save-profile" @click="saveProfile"><Check :size="18" /> រក្សាទុក Profile</button>
-      </section>
-    </div>
 
     <!-- Reward request confirmation -->
     <div v-if="rewardDialog" class="modal-backdrop" @click.self="rewardDialog = ''">
@@ -171,12 +151,12 @@
 <script setup>
 import { computed, inject, onMounted, reactive, ref, watch } from 'vue';
 import {
-  Armchair, ArrowRight, BookmarkCheck, BookOpen, CalendarCheck, Camera,
+  Armchair, ArrowRight, BookmarkCheck, BookOpen, CalendarCheck,
   Check, CheckCircle2, ChevronRight, Flame, Info, Sparkles, Star, Trophy,
   UserRound, X
 } from '@lucide/vue';
 
-const emit = defineEmits(['navigate']);
+const emit = defineEmits(['navigate', 'edit-profile']);
 const locale = inject('locale', ref('km'));
 const studentProfile = inject('studentProfile', null);
 
@@ -186,9 +166,6 @@ const LOANS_KEY = 'leafline_book_holds';
 
 const defaultProfile = { fullName: '', studentId: '', email: '', phone: '', faculty: '', year: '', avatar: '' };
 const profile = reactive({ ...defaultProfile });
-const profileDraft = reactive({ ...defaultProfile });
-const profileOpen = ref(false);
-const profileError = ref('');
 const toastMessage = ref('');
 const checkinMessage = ref('');
 const rewardDialog = ref('');
@@ -271,56 +248,9 @@ function syncProfile(source) {
   Object.assign(profile, { ...defaultProfile, ...source });
 }
 
-function persistProfile() {
-  const value = { ...profile };
-  saveLocal(PROFILE_KEY, value);
-  if (studentProfile?.value && typeof studentProfile.value === 'object') {
-    Object.assign(studentProfile.value, value);
-  }
-}
-
-function openProfile() {
-  Object.assign(profileDraft, { ...defaultProfile, ...profile });
-  profileError.value = '';
-  profileOpen.value = true;
-}
-
-function saveProfile() {
-  if (!profileDraft.fullName.trim()) {
-    profileError.value = 'សូមបញ្ចូលឈ្មោះរបស់អ្នកជាមុនសិន។';
-    return;
-  }
-  Object.assign(profile, { ...profileDraft, fullName: profileDraft.fullName.trim() });
-  persistProfile();
-  profileOpen.value = false;
-  toastMessage.value = 'បានរក្សាទុក Profile របស់អ្នករួចរាល់ហើយ 💚';
-}
-
 function initials(name = '') {
   const clean = name.trim();
   return clean ? clean.split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase() : 'U';
-}
-
-function handleAvatar(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  if (!file.type.startsWith('image/')) {
-    profileError.value = 'សូមជ្រើសរើសឯកសាររូបភាព។';
-    event.target.value = '';
-    return;
-  }
-  if (file.size > 2 * 1024 * 1024) {
-    profileError.value = 'រូបភាពធំពេក។ សូមជ្រើសរើសរូបភាពតូចជាង 2MB។';
-    event.target.value = '';
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = () => {
-    profileDraft.avatar = String(reader.result || '');
-    profileError.value = '';
-  };
-  reader.onerror = () => { profileError.value = 'មិនអាចអានរូបភាពនេះបានទេ។'; };
-  reader.readAsDataURL(file);
 }
 
 function saveRewards() {
