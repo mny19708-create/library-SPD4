@@ -14,9 +14,10 @@ An integrated management platform combining real-time study room reservation wit
    ```bash
    git clone [https://github.com/mny19708-create/library-SPD4.git](https://github.com/mny19708-create/library-SPD4.git)
    cd library-SPD4
-Install Dependencies:Bashnpm install
+Install Dependencies:  npm install
 Environment Setup:
-Create a .env file based on .env.example and set up database credentials.Run Development Server:Bashnpm run dev
+Create a .env file based on .env.example and set up database credentials.
+Run Development Server:npm run dev
 ## 👥 Project Team
 
 | Name | Role | Primary Responsibilities |
