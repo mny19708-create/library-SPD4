@@ -11,4 +11,12 @@ An integrated management platform combining real-time study room reservation wit
 Install Dependencies:Bashnpm install
 Environment Setup:
 Create a .env file based on .env.example and set up database credentials.Run Development Server:Bashnpm run dev
-👥 Project TeamNameRolePrimary ResponsibilitiesVa ManyProject ManagerProject Planning, Task Allocation, Architecture Setup, & Team CoordinationPov RothaBackend & AI EngineerBackend API Development, Database Integration, & AI Features ImplementationSot MouchhengBackend & AI EngineerBackend Logic, Database Schema, & AI Model IntegrationVen SreyleakFrontend DeveloperUser Interface Design, Vue.js Development, & Component IntegrationSoy LongQA & DevOpsQuality Assurance, Software Testing, Bug Tracking, & CI/CD Deployment
+## 👥 Project Team
+
+| Name | Role | Primary Responsibilities |
+| :--- | :--- | :--- |
+| **Va Many** | Project Manager | Project Planning, Task Allocation, Architecture Setup, & Team Coordination |
+| **Pov Rotha** | Backend & AI Engineer | Backend API Development, Database Integration, & AI Features Implementation |
+| **Sot Mouchheng** | Backend & AI Engineer | Backend Logic, Database Schema, & AI Model Integration |
+| **Ven Sreyleak** | Frontend Developer | User Interface Design, Vue.js Development, & Component Integration |
+| **Soy Long** | QA & DevOps | Quality Assurance, Software Testing, Bug Tracking, & CI/CD Deployment |
