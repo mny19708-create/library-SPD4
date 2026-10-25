@@ -2,6 +2,12 @@
 
 An integrated management platform combining real-time study room reservation with dynamic QR verification, online book loans, and a gamified learning reward point system.
 
+
+## 💻 Tech Stack
+
+- **Frontend:** Vue.js, Vite, Pinia
+- **Backend:** Node.js, Express.js, Socket.io
+- **Database:** PostgreSQL (Supabase)
 ## 🚀 Quick Setup Guide
 
 1. **Clone the Repository:**
