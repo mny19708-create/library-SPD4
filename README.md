@@ -1,4 +1,4 @@
-Markdown# 📚 Library Room Booker & Learning Rewards System
+📚 Library Room Booker & Learning Rewards System
 
 An integrated management platform combining real-time study room reservation with dynamic QR verification, online book loans, and a gamified learning reward point system.
 
