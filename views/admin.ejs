@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MAKE LIBRARY</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Font (Kantumruy Pro) -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-green: #10B981;
+            --accent-orange: #F59E0B;
+            --bg-color: #0b0f19;
+            --card-bg: #131b2e;
+            --border-color: #2a3eb157;
+            --text-color: #ffffff;
+            --text-muted: #e2e8f0;
+        }
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Kantumruy Pro', sans-serif;
+            color: var(--text-color);
+        }
+        .archive-top-bar {
+            background-color: #090d16;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 6px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .library-header {
+            background-color: #131b2e;
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
+        }
+        .navbar-brand-custom {
+            font-weight: 700;
+            color: var(--primary-green);
+            text-decoration: none;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+        .navbar-brand-custom span {
+            color: var(--accent-orange);
+            margin-left: 6px;
+        }
+        .sidebar {
+            min-height: calc(100vh - 96px);
+            background-color: #131b2e;
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 96px;
+            left: 0;
+            width: 260px;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        .sidebar-menu {
+            padding: 15px;
+            list-style: none;
+            margin: 0;
+        }
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--primary-green);
+        }
+        .sidebar-menu a i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+        .card-custom {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            color: var(--text-color);
+        }
+        .badge-category {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--primary-green);
+            font-weight: 600;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+        .btn-primary-custom {
+            background-color: var(--primary-green);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .btn-primary-custom:hover {
+            background-color: #059669;
+            color: #fff;
+        }
+        .book-cover-card {
+            height: 210px;
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+        .cover-green { background: linear-gradient(135deg, #065f46, #10b981); }
+        .cover-orange { background: linear-gradient(135deg, #92400e, #f59e0b); }
+        .cover-blue { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+        .cover-default { background: linear-gradient(135deg, #1e293b, #475569); }
+
+        .book-cover-card.p-0 { padding: 0; }
+        .book-cover-card img.book-cover-image {
+            display: block;
+            width: 100%;
+            height: 210px;
+            object-fit: cover;
+            background: #0f172a;
+            border-radius: 12px;
+        }
+        .cover-fallback {
+            width: 100%;
+            height: 100%;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            position: relative;
+        }
+        .form-control, .form-select {
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            color: #ffffff;
+        }
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #0f172a;
+            border-color: var(--primary-green);
+            color: #ffffff;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+        }
+        @media (max-width: 767.98px) {
+            .sidebar { display: none !important; }
+            .main-content { margin-left: 0; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <%
+        const bookList = (typeof books !== 'undefined' && Array.isArray(books)) ? books : [];
+        const bookTotal = (typeof totalBooks !== 'undefined' && Number.isFinite(Number(totalBooks))) ? Number(totalBooks) : bookList.length;
+        const userTotal = (typeof totalUsers !== 'undefined' && Number.isFinite(Number(totalUsers))) ? Number(totalUsers) : 0;
+        const totalViewsCount = (typeof totalViews !== 'undefined' && Number.isFinite(Number(totalViews))) ? Number(totalViews) : 0;
+        const percentageStatVal = (typeof percentageStat !== 'undefined' && Number.isFinite(Number(percentageStat))) ? Number(percentageStat) : 0;
+        const monthLabels = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា'];
+        const monthValues = monthLabels.map(() => 0);
+        const categoryCounts = bookList.reduce((counts, book) => {
+            const category = book && book.category ? String(book.category) : 'ទូទៅ';
+            counts[category] = (counts[category] || 0) + 1;
+            return counts;
+        }, {});
+        const categoryLabels = Object.keys(categoryCounts);
+        const categoryValues = Object.values(categoryCounts);
+        const safeJson = value => JSON.stringify(value).replace(/</g, '\\u003c');
+    %>
+
+    <!-- Top Dark Bar -->
+    <div class="archive-top-bar d-flex justify-content-between align-items-center">
+        <div><i class="bi bi-bank me-1"></i> <strong>MAKE LIBRARY SYSTEM</strong></div>
+        <div><span class="small">📅 ថ្ងៃនេះ: <%= new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Phnom_Penh" }) %></span></div>
+    </div>
+
+    <!-- Main Header Bar -->
+    <header class="library-header shadow-sm sticky-top">
+        <div class="container-fluid d-flex flex-nowrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-secondary border-0 d-md-none me-1 p-1 text-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+                    <i class="bi bi-list fs-3"></i>
+                </button>
+                <a class="navbar-brand-custom text-truncate" href="/admin">
+                    <i class="bi bi-book-half me-1"></i> MAKE <span>LIBRARY</span>
+                </a>
+            </div>
+            <div class="d-flex align-items-center bg-dark border border-secondary rounded-pill px-3 py-1 shadow-sm flex-grow-1 mx-2" style="max-width: 350px;">
+                <i class="bi bi-search text-light me-2"></i>
+                <input type="text" id="searchInput" class="form-control form-control-sm bg-transparent border-0 shadow-none text-light" placeholder="ស្វែងរកតាមចំណងជើង...">
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="fw-semibold small d-none d-md-inline text-light">
+                    <i class="bi bi-person-circle fs-5 text-success align-middle me-1"></i> Admin
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start bg-dark text-light" tabindex="-1" id="mobileSidebar">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h5 class="fw-bold text-success"><i class="bi bi-book-half me-2"></i> MAKE LIBRARY</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column justify-content-between p-0">
+            <ul class="sidebar-menu p-3">
+                <li><a href="/admin" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="#add-book-section" data-bs-dismiss="offcanvas"><i class="bi bi-plus-circle"></i> បន្ថែមសៀវភៅថ្មី</a></li>
+                <li><a href="/" target="_blank"><i class="bi bi-globe"></i> មើលទំព័រ User</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <div class="sidebar d-none d-md-flex flex-column justify-content-between">
+        <ul class="sidebar-menu">
+            <li><a href="/admin" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            <li><a href="#add-book-section"><i class="bi bi-plus-circle"></i> បន្ថែមសៀវភៅថ្មី</a></li>
+            <li><a href="/" target="_blank"><i class="bi bi-globe"></i> មើលទំព័រ User</a></li>
+        </ul>
+        <div class="p-3 border-top border-secondary">
+            <a href="/admin/logout" class="btn btn-outline-danger w-100 rounded-pill"><i class="bi bi-box-arrow-right me-1"></i> ចាកចេញ</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-custom p-4 border-start border-4 border-success">
+                    <div class="d-flex align-items-center">
+                        <div class="fs-1 text-success me-3 bg-dark p-3 rounded-4"><i class="bi bi-journal-bookmark-fill"></i></div>
+                        <div>
+                            <span class="text-white text-uppercase fw-bold small d-block">សៀវភៅសរុប</span>
+                            <h3 class="fw-bold mb-0 text-white"><%= bookTotal %> <span class="fs-6 text-light">ក្បាល</span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-custom p-4 border-start border-4 border-primary">
+                    <div class="d-flex align-items-center">
+                        <div class="fs-1 text-primary me-3 bg-dark p-3 rounded-4"><i class="bi bi-people-fill"></i></div>
+                        <div>
+                            <span class="text-white text-uppercase fw-bold small d-block">អ្នកប្រើប្រាស់</span>
+                            <h3 class="fw-bold mb-0 text-white"><%= userTotal %> <span class="fs-6 text-light">នាក់</span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-custom p-4 border-start border-4 border-warning">
+                    <div class="d-flex align-items-center">
+                        <div class="fs-1 text-warning me-3 bg-dark p-3 rounded-4"><i class="bi bi-eye-fill"></i></div>
+                        <div>
+                            <span class="text-white text-uppercase fw-bold small d-block">ចំនួនមើលសរុប</span>
+                            <h3 class="fw-bold mb-0 text-white"><%= totalViewsCount %> <span class="fs-6 text-light">ដង</span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-custom p-4 border-start border-4 border-info">
+                    <div class="d-flex align-items-center">
+                        <div class="fs-1 text-info me-3 bg-dark p-3 rounded-4"><i class="bi bi-pie-chart-fill"></i></div>
+                        <div>
+                            <span class="text-white text-uppercase fw-bold small d-block">ស្ថិតិភាគរយអាន</span>
+                            <h3 class="fw-bold mb-0 text-white"><%= percentageStatVal %> <span class="fs-6 text-light">%</span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="card card-custom p-4 h-100">
+                    <h5 class="fw-bold text-white mb-3"><i class="bi bi-graph-up text-success me-2"></i>ស្ថិតិការខ្ចីសៀវភៅប្រចាំខែ</h5>
+                    <div class="chart-container" style="position: relative; height: 280px;"><canvas id="borrowChart"></canvas></div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card card-custom p-4 h-100">
+                    <h5 class="fw-bold text-white mb-3"><i class="bi bi-pie-chart-fill text-warning me-2"></i>ប្រភេទសៀវភៅនិយម</h5>
+                    <div class="chart-container" style="position: relative; height: 280px;"><canvas id="categoryChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Book Form Section -->
+        <div id="add-book-section" class="card card-custom p-4 mb-4">
+            <h5 class="fw-bold text-white mb-3">
+                <i class="bi bi-plus-circle-fill text-success me-2"></i> បន្ថែមសៀវភៅថ្មី
+            </h5>
+            <form action="/admin/books/add" method="POST" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-white">ចំណងជើងសៀវភៅ</label>
+                        <input type="text" name="title" class="form-control rounded-3" placeholder="ឧ. ប្រវត្តិសាស្ត្រខ្មែរ" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-white">អ្នកនិពន្ធ</label>
+                        <input type="text" name="author" class="form-control rounded-3" placeholder="ឧ. មិនស្គាល់">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-white">ប្រភេទសៀវភៅ</label>
+                        <select name="category" class="form-select rounded-3" required>
+                            <option value="" disabled selected>ជ្រើសរើសប្រភេទ...</option>
+                            <option value="រឿងប្រលោមលោក និងកវីនិពន្ធ">រឿងប្រលោមលោក និងកវីនិពន្ធ</option>
+                            <option value="សៀវភៅសិក្សា និងភាសាបរទេស">សៀវភៅសិក្សា និងភាសាបរទេស</option>
+                            <option value="ឯកសារ និងចំណេះដឹងទូទៅ">ឯកសារ និងចំណេះដឹងទូទៅ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-white">Google Drive Link (PDF)</label>
+                        <input type="url" name="driveLink" class="form-control rounded-3" placeholder="https://drive.google.com/..." required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="coverImageInput" class="form-label small fw-bold text-white">រូបភាពគម្របសៀវភៅ (JPG, PNG, WEBP)</label>
+                        <input type="file" id="coverImageInput" name="coverImage" class="form-control rounded-3 text-white" accept="image/jpeg,image/png,image/webp" required>
+                        <div class="form-text text-light small">សូមជ្រើសរើសរូបភាពគម្របពីកុំព្យូទ័ររបស់អ្នក (ទំហំអតិបរមា 5MB)។</div>
+                        <div id="coverPreviewWrap" class="mt-3 d-none">
+                            <img id="coverPreview" src="#" alt="Preview" class="img-thumbnail bg-dark border-secondary" style="max-height: 220px; max-width: 160px; object-fit: contain;">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary-custom px-4 py-2">
+                        <i class="bi bi-save me-1"></i> រក្សាទុកសៀវភៅ
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Book Gallery Section -->
+        <div id="book-list-section" class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold text-white m-0">
+                    <i class="bi bi-collection-fill text-success me-2"></i> បញ្ជីសៀវភៅទាំងអស់ (Book Gallery)
+                </h5>
+                <span class="badge bg-secondary rounded-pill px-3 py-2"><%= bookList.length %> ក្បាលក្នុងប្រព័ន្ធ</span>
+            </div>
+
+            <% if(bookList.length === 0) { %>
+                <div class="card card-custom p-5 text-center text-light">
+                    <i class="bi bi-journal-x display-4 mb-2 text-warning"></i>
+                    <p class="mb-0">មិនទាន់មានទិន្នន័យសៀវភៅនៅឡើយទេ</p>
+                </div>
+            <% } else { %>
+                <div class="row g-4" id="booksGrid">
+                    <% bookList.forEach((book, index) => { 
+                        let coverClass = 'cover-default';
+                        if (book.category === 'រឿងប្រលោមលោក និងកវីនិពន្ធ') coverClass = 'cover-green';
+                        else if (book.category === 'សៀវភៅសិក្សា និងភាសាបរទេស') coverClass = 'cover-orange';
+                        else if (book.category === 'ឯកសារ និងចំណេះដឹងទូទៅ') coverClass = 'cover-blue';
+                        const savedCoverImage = book.cover_image || book.coverImage || book.cover_path || book.cover_url || '';
+                    %>
+                        <div class="col-xl-3 col-lg-4 col-md-6 book-card-item">
+                            <div class="card card-custom h-100 p-3 d-flex flex-column justify-content-between border-0 shadow-sm">
+                                <div>
+                                    <div class="book-cover-card mb-3 <%= coverClass %> p-0">
+                                        <% if (savedCoverImage) { %>
+                                            <img class="book-cover-image" src="<%= savedCoverImage %>" alt="<%= book.title %>" loading="lazy" onerror="this.style.display='none'; this.parentElement.querySelector('.cover-fallback').style.display='flex';">
+                                        <% } %>
+                                        <div class="cover-fallback <%= coverClass %>" style="<%= savedCoverImage ? 'display:none;' : 'display:flex;' %>">
+                                            <div class="d-flex justify-content-between align-items-center w-100">
+                                                <span class="badge bg-black bg-opacity-25 px-2 py-1 small font-monospace">#<%= index + 1 %></span>
+                                                <i class="bi bi-book-half fs-5 opacity-75"></i>
+                                            </div>
+                                            <div class="text-center py-2 px-1">
+                                                <h6 class="fw-bold text-white mb-1 text-truncate" style="font-size: 1.05rem;" title="<%= book.title %>"><%= book.title %></h6>
+                                                <small class="text-white-50 d-block text-truncate" style="font-size: 0.85rem;"><%= book.author || 'មិនស្គាល់' %></small>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center w-100 text-white-50" style="font-size: 0.75rem;">
+                                                <span><i class="bi bi-folder2-open me-1"></i> Make Library</span>
+                                                <i class="bi bi-journal-text"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
+                                        <span class="badge badge-category px-2 py-1 text-truncate" style="max-width: 65%;" title="<%= book.category || 'ទូទៅ' %>"><%= book.category || 'ទូទៅ' %></span>
+                                        <span class="small text-light font-monospace text-nowrap"><%= new Date(book.created_at).toLocaleDateString() %></span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center border-top border-secondary pt-2 mb-3">
+                                        <span class="small text-light fw-semibold">
+                                            <i class="bi bi-eye text-success me-1"></i> <%= book.views || 0 %> ដង
+                                        </span>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="/books/read/<%= book.id %>" target="_blank" class="btn btn-sm btn-outline-success rounded-pill flex-grow-1 fw-semibold">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i> អាន
+                                        </a>
+                                        <!-- ប៊ូតុងបើក Modal កែប្រែ -->
+                                        <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editBookModal<%= book.id %>" title="កែប្រែ">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <form action="/admin/books/delete/<%= book.id %>" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('តើអ្នកពិតជាចង់លុបសៀវភៅនេះមែនទេ?')" title="លុប">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Edit Book Modal for each book -->
+                        <div class="modal fade" id="editBookModal<%= book.id %>" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-dark text-light border border-secondary">
+                                    <div class="modal-header border-secondary">
+                                        <h5 class="modal-title fw-bold text-warning"><i class="bi bi-pencil-square me-2"></i>កែប្រែព័ត៌មានសៀវភៅ</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="/admin/books/edit/<%= book.id %>" method="POST" enctype="multipart/form-data">
+                                        <div class="modal-body text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-white">ចំណងជើងសៀវភៅ</label>
+                                                <input type="text" name="title" class="form-control rounded-3" value="<%= book.title %>" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-white">អ្នកនិពន្ធ</label>
+                                                <input type="text" name="author" class="form-control rounded-3" value="<%= book.author || '' %>">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-white">ប្រភេទសៀវភៅ</label>
+                                                <select name="category" class="form-select rounded-3" required>
+                                                    <option value="រឿងប្រលោមលោក និងកវីនិពន្ធ" <%= book.category === 'រឿងប្រលោមលោក និងកវីនិពន្ធ' ? 'selected' : '' %>>រឿងប្រលោមលោក និងកវីនិពន្ធ</option>
+                                                    <option value="សៀវភៅសិក្សា និងភាសាបរទេស" <%= book.category === 'សៀវភៅសិក្សា និងភាសាបរទេស' ? 'selected' : '' %>>សៀវភៅសិក្សា និងភាសាបរទេស</option>
+                                                    <option value="ឯកសារ និងចំណេះដឹងទូទៅ" <%= book.category === 'ឯកសារ និងចំណេះដឹងទូទៅ' ? 'selected' : '' %>>ឯកសារ និងចំណេះដឹងទូទៅ</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-white">Google Drive Link (PDF)</label>
+                                                <input type="url" name="driveLink" class="form-control rounded-3" value="<%= book.drive_link || '' %>" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-white">រូបភាពគម្របសៀវភៅថ្មី (បើចង់ប្ដូរ)</label>
+                                                <input type="file" name="coverImage" class="form-control rounded-3 text-white" accept="image/jpeg,image/png,image/webp">
+                                                <div class="form-text text-light small">ទុកទว่างប្រសិនបើមិនចង់ប្តូររូបភាពគម្របចាស់។</div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-secondary">
+                                            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">បោះបង់</button>
+                                            <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">រក្សាទុកការកែប្រែ</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const coverInput = document.getElementById('coverImageInput');
+            const previewWrap = document.getElementById('coverPreviewWrap');
+            const previewImage = document.getElementById('coverPreview');
+            if (coverInput && previewWrap && previewImage) {
+                coverInput.addEventListener('change', function () {
+                    const file = this.files && this.files[0];
+                    if (!file) {
+                        previewImage.removeAttribute('src');
+                        previewWrap.classList.add('d-none');
+                        return;
+                    }
+                    previewImage.src = URL.createObjectURL(file);
+                    previewWrap.classList.remove('d-none');
+                });
+            }
+
+            const searchInput = document.getElementById('searchInput');
+            const bookCards = Array.from(document.querySelectorAll('.book-card-item'));
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const filter = this.value.trim().toLocaleLowerCase();
+                    bookCards.forEach(function (card) {
+                        const text = (card.textContent || '').toLocaleLowerCase();
+                        card.style.display = text.includes(filter) ? '' : 'none';
+                    });
+                });
+            }
+
+            if (typeof Chart !== 'undefined') {
+                const borrowCanvas = document.getElementById('borrowChart');
+                if (borrowCanvas) {
+                    new Chart(borrowCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: <%- safeJson(monthLabels) %>,
+                            datasets: [{
+                                label: 'ចំនួនការខ្ចី',
+                                data: <%- safeJson(monthValues) %>,
+                                backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                                borderColor: '#10B981',
+                                borderWidth: 1,
+                                borderRadius: 6,
+                                maxBarThickness: 42
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { 
+                                x: { ticks: { color: '#ffffff' }, grid: { color: '#1e293b' } },
+                                y: { beginAtZero: true, ticks: { precision: 0, color: '#ffffff' }, grid: { color: '#1e293b' } } 
+                            }
+                        }
+                    });
+                }
+
+                const categoryCanvas = document.getElementById('categoryChart');
+                if (categoryCanvas) {
+                    const labels = <%- safeJson(categoryLabels.length ? categoryLabels : ['មិនទាន់មានទិន្នន័យ']) %>;
+                    const values = <%- safeJson(categoryValues.length ? categoryValues : [0]) %>;
+                    new Chart(categoryCanvas, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: values,
+                                backgroundColor: ['#10B981', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#64748B'],
+                                borderWidth: 2,
+                                borderColor: '#131b2e'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom', labels: { color: '#ffffff' } } },
+                            cutout: '62%'
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
