@@ -49,6 +49,8 @@ CREATE TABLE books (
   publication_year SMALLINT UNSIGNED NULL,
   category VARCHAR(120) NULL,
   shelf_location VARCHAR(120) NULL,
+  digital_url VARCHAR(2048) NULL,
+  digital_content LONGTEXT NULL,
   total_copies INT UNSIGNED NOT NULL DEFAULT 0,
   available_copies INT UNSIGNED NOT NULL DEFAULT 0,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,

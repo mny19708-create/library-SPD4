@@ -6,7 +6,14 @@
 		<button class="language-toggle registration-language-toggle" type="button" @click="toggleLocale">{{ locale === 'km' ? 'English' : 'ខ្មែរ' }}</button>
 		<aside class="registration-story">
 			<a class="registration-brand" href="#home"><span><strong>បណ្ណាល័យ</strong></span></a>
-			<div class="story-copy"><p class="story-eyebrow">សម្រាប់និស្សិតសាកលវិទ្យាល័យ</p><h1>កន្លែងសិក្សាល្អ<br>ចាប់ផ្ដើមពីអ្នក។</h1><p>បង្កើតគណនីនិស្សិត ដើម្បីកក់បន្ទប់ និងប្រើសេវាកម្មបណ្ណាល័យ។</p><div class="story-list"><span><i>១</i> បំពេញព័ត៌មាននិស្សិត</span><span><i>២</i> ជ្រើសរើសឆ្នាំសិក្សា</span><span><i>៣</i> ចាប់ផ្ដើមសិក្សា</span></div></div>
+			<div class="story-copy"><p class="story-eyebrow">សៀវភៅសម្រាប់អ្នកអានគ្រប់រូប</p><h1>ស្វែងរកសៀវភៅ<br>ហើយចាប់ផ្ដើមអាន។</h1><p>បង្កើតគណនី ដើម្បីរក្សាទុកបញ្ជីសៀវភៅដែលអ្នកបានអាន។</p><div class="story-list"><span><i>១</i> ស្វែងរកសៀវភៅតាមអនឡាញ</span><span><i>២</i> បើកអានសៀវភៅឌីជីថល</span><span><i>៣</i> រក្សាទុកសៀវភៅដែលបានអាន</span></div></div>
+			<div class="registration-book-art" aria-hidden="true">
+				<div class="book-art-glow"></div>
+				<div class="book-art-card"><span>YOUR NEXT CHAPTER</span><strong>READ<br>ANYWHERE</strong><i>✦</i></div>
+				<div class="book-art-book book-art-book-one">📘</div>
+				<div class="book-art-book book-art-book-two">📗</div>
+				<div class="book-art-book book-art-book-three">📕</div>
+			</div>
 			<div class="story-footer">សេវាកម្មបណ្ណាល័យ <span>·</span> ២០២៦</div>
 		</aside>
 		<main class="registration-main">
@@ -32,7 +39,7 @@
 				</form>
 				<form v-else class="registration-form" @submit.prevent="registerStudent">
 					<div class="form-grid">
-						<label class="field full-field">ឈ្មោះពេញ<input v-model.trim="registration.fullName" type="text" autocomplete="name" placeholder="ឧ. សុខ ដារ៉ា" required minlength="2"></label>
+						<label class="field">ឈ្មោះពេញ<input v-model.trim="registration.fullName" type="text" autocomplete="name" placeholder="ឧ. សុខ ដារ៉ា" required minlength="2"></label>
 						<label class="field">លេខសម្គាល់និស្សិត<input v-model.trim="registration.studentId" type="text" autocomplete="off" placeholder="ឧ. 2026-12345" required></label>
 						<label class="field">អ៊ីមែលសាកលវិទ្យាល័យ<input v-model.trim="registration.email" type="email" autocomplete="email" placeholder="name@university.edu" required></label>
 						<label class="field">មហាវិទ្យាល័យ<select v-model="registration.faculty" required><option disabled value="">ជ្រើសរើសមហាវិទ្យាល័យ</option><option v-for="faculty in faculties" :key="faculty.value" :value="faculty.value">{{ faculty.label }}</option></select></label>
@@ -49,7 +56,7 @@
 								</button>
 							</div>
 						</label>
-						<label class="field full-field">បញ្ជាក់ពាក្យសម្ងាត់
+						<label class="field">បញ្ជាក់ពាក្យសម្ងាត់
 							<div class="password-input-wrap">
 								<input v-model="registration.confirmPassword" :type="showConfirmPassword ? 'text' : 'password'" autocomplete="new-password" placeholder="វាយពាក្យសម្ងាត់ម្ដងទៀត" required minlength="8">
 								<button class="password-toggle" type="button" :aria-label="showConfirmPassword ? (locale === 'km' ? 'លាក់ពាក្យសម្ងាត់' : 'Hide password') : (locale === 'km' ? 'បង្ហាញពាក្យសម្ងាត់' : 'Show password')" :aria-pressed="showConfirmPassword" @click="showConfirmPassword = !showConfirmPassword">
@@ -70,28 +77,25 @@
 			</div>
 		</main>
 	</div>
-	<div v-else v-translate="locale" class="app-frame" :class="{ 'dark-theme': darkTheme, 'dashboard-theme': darkTheme && currentPage === 'dashboard' }" :lang="locale">
+	<div v-else v-translate="locale" class="app-frame" :class="{ 'dark-theme': darkTheme }" :lang="locale">
 		<aside class="sidebar" :class="{ 'sidebar-open': menuOpen }">
-			<a class="brand" href="#home" @click.prevent="navigate('dashboard')">
-				<span class="brand-copy"><strong>បណ្ណាល័យ</strong></span>
+			<a class="brand" href="#catalog" @click.prevent="navigate('catalog')">
+				<span class="brand-copy"><strong>បណ្ណាល័យអនឡាញ</strong></span>
 			</a>
 
-			<div class="campus-label">សេវាកម្មបណ្ណាល័យ</div>
+			<div class="campus-label">អានសៀវភៅតាមអនឡាញ</div>
 			<nav class="main-nav" aria-label="ម៉ឺនុយមេ">
 				<button v-for="item in navigationItems" :key="item.id" class="nav-item" :class="{ active: currentPage === item.id }" @click="navigate(item.id)">
 					<span class="nav-icon" aria-hidden="true"><component :is="item.icon" :size="17" :stroke-width="2.2" /></span>
 					<span>{{ item.label }}</span>
-					<span v-if="item.id === 'loans'" class="nav-count">2</span>
-					<span v-else-if="item.id === 'cart' && cartCount" class="nav-count">{{ cartCount }}</span>
 				</button>
 			</nav>
 
 			<div class="sidebar-spacer"></div>
-			<div class="points-card">
-				<div class="points-top"><span class="sparkle">✳</span><span>ពិន្ទុសិក្សា</span></div>
-				<strong>1,240 <small>ពិន្ទុ</small></strong>
-				<div class="points-track"><span></span></div>
-				<p>ខ្វះ 260 ពិន្ទុទៀត ដល់រង្វាន់បន្ទាប់</p>
+			<div class="online-promo">
+				<span aria-hidden="true">📖</span>
+				<strong>ពិភពសៀវភៅនៅចុងដៃអ្នក</strong>
+				<p>ស្វែងរក ចាប់ផ្ដើមអាន ហើយរក្សាទុកសៀវភៅដែលអ្នកចូលចិត្ត។</p>
 			</div>
 				<div class="profile-area">
 					<div class="profile-button">
@@ -115,8 +119,7 @@
 						<span aria-hidden="true">{{ darkTheme ? '☀' : '☾' }}</span>{{ darkTheme ? 'ពណ៌ស' : 'ពណ៌ងងឹត' }}
 					</button>
 					<button class="language-toggle" type="button" :aria-label="locale === 'km' ? 'Switch to English' : 'ប្តូរទៅភាសាខ្មែរ'" @click="toggleLocale">{{ locale === 'km' ? 'EN' : 'ខ្មែរ' }}</button>
-					  <span class="open-status"><i></i> បើកដំណើរការ <b>ដល់ម៉ោង ១០ យប់</b></span>
-					  <span class="icon-button" aria-label="ការជូនដំណឹង">♧<i class="notification-dot"></i></span>
+					  <span class="open-status"><i></i> បណ្ណាល័យអនឡាញ</span>
 					<img v-if="student.avatar" class="top-avatar" :src="student.avatar" alt="" aria-hidden="true">
 					<span v-else class="top-avatar" aria-hidden="true">{{ initials }}</span>
 				</div>
@@ -158,35 +161,25 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, provide, ref } from 'vue';
-import DashboardView from '@/views/DashboardView.vue';
-import RoomMap from '@/views/RoomMap.vue';
+import { computed, provide, ref } from 'vue';
 import CatalogView from '@/views/CatalogView.vue';
-import UserLoans from '@/views/UserLoans.vue';
-import CartView from '@/views/CartView.vue';
+import ReadingListView from '@/views/ReadingListView.vue';
 import api, { apiConfigured } from '@/services/api';
-import { Armchair, BookOpen, BookmarkCheck, House, ShoppingCart } from '@lucide/vue';
+import { BookOpen, BookmarkCheck } from '@lucide/vue';
 
 const navigation = [
-	{ id: 'dashboard', label: 'ទំព័រដើម', icon: House },
-	{ id: 'rooms', label: 'កក់បន្ទប់សិក្សា', icon: Armchair },
 	{ id: 'catalog', label: 'ស្វែងរកសៀវភៅ', icon: BookOpen },
-	{ id: 'loans', label: 'សៀវភៅខ្ចី', icon: BookmarkCheck },
-	{ id: 'cart', label: 'កន្ត្រក', icon: ShoppingCart },
+	{ id: 'reading', label: 'សៀវភៅដែលបានអាន', icon: BookmarkCheck },
 ];
 
 const pages = {
-	dashboard: DashboardView,
-	rooms: RoomMap,
 	catalog: CatalogView,
-	loans: UserLoans,
-	cart: CartView,
+	reading: ReadingListView,
 };
-const currentPage = ref('dashboard');
+const currentPage = ref('catalog');
 const menuOpen = ref(false);
 const darkTheme = ref(localStorage.getItem('leafline_theme') !== 'light');
 const locale = ref(localStorage.getItem('leafline_locale') === 'en' ? 'en' : 'km');
-const cartCount = ref(0);
 const student = ref(null);
 const registering = ref(false);
 const registrationError = ref('');
@@ -214,14 +207,11 @@ const activeComponent = computed(() => pages[currentPage.value]);
 const navigationItems = computed(() => navigation.map((item) => ({
 	...item,
 	label: locale.value === 'en' ? ({
-		dashboard: 'Home',
-		rooms: 'Book a room',
 		catalog: 'Find books',
-		loans: 'My loans',
-		cart: 'Cart',
+		reading: 'Books I have read',
 	}[item.id] ?? item.label) : item.label,
 })));
-const activeTitle = computed(() => navigationItems.value.find((item) => item.id === currentPage.value)?.label ?? 'ទំព័រដើម');
+const activeTitle = computed(() => navigationItems.value.find((item) => item.id === currentPage.value)?.label ?? 'ស្វែងរកសៀវភៅ');
 const initials = computed(() => student.value?.fullName?.trim().split(/\s+/).slice(0, 2).map((part) => [...part][0]).join('') ?? 'ន');
 
 provide('studentProfile', student);
@@ -243,18 +233,6 @@ function toggleTheme() {
 function toggleLocale() {
 	locale.value = locale.value === 'km' ? 'en' : 'km';
 	localStorage.setItem('leafline_locale', locale.value);
-}
-
-function refreshCartCount() {
-	try {
-		const savedCart = JSON.parse(localStorage.getItem('leafline_book_cart') || '[]');
-		cartCount.value = Array.isArray(savedCart)
-			? savedCart.reduce((total, item) => total + Number(item.quantity || 1), 0)
-			: 0;
-	} catch (error) {
-		console.error('Unable to read the book cart:', error);
-		cartCount.value = 0;
-	}
 }
 
 async function registerStudent() {
@@ -527,15 +505,6 @@ function navigate(page) {
 	menuOpen.value = false;
 }
 
-onMounted(() => {
-	refreshCartCount();
-	window.addEventListener('storage', refreshCartCount);
-	window.addEventListener('leafline-cart-updated', refreshCartCount);
-});
-onBeforeUnmount(() => {
-	window.removeEventListener('storage', refreshCartCount);
-	window.removeEventListener('leafline-cart-updated', refreshCartCount);
-});
 </script>
 
 <style>
@@ -2833,6 +2802,34 @@ select:focus-visible, textarea:focus-visible {
   box-shadow: 0 7px 18px rgba(5, 20, 10, .17);
 }
 
+.online-promo {
+  margin: 0 18px 18px;
+  padding: 16px;
+  border: 1px solid rgba(203, 229, 202, .18);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .07);
+  color: #e8f3e7;
+}
+
+.online-promo > span {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 23px;
+}
+
+.online-promo strong {
+  display: block;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.online-promo p {
+  margin: 6px 0 0;
+  color: #b9d1bd;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
 .nav-item {
   min-height: 49px;
   border-radius: 14px;
@@ -3154,6 +3151,385 @@ select:focus-visible, textarea:focus-visible {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+  }
+}
+
+.registration-page {
+  grid-template-columns: minmax(360px, .88fr) minmax(0, 1.12fr);
+  background:
+    radial-gradient(ellipse at 82% 12%, rgba(223, 240, 215, .72), transparent 31%),
+    radial-gradient(ellipse at 96% 88%, rgba(242, 227, 194, .42), transparent 28%),
+    #f7f8f2;
+}
+
+.registration-story {
+  min-height: 100vh;
+  padding: 38px clamp(30px, 5.3vw, 78px);
+  background:
+    radial-gradient(ellipse at 76% 88%, rgba(131, 180, 113, .28), transparent 34%),
+    radial-gradient(circle at 12% 75%, rgba(68, 129, 84, .42), transparent 36%),
+    linear-gradient(150deg, #173b2c 0%, #1c4a35 52%, #285c40 100%);
+}
+
+.registration-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+}
+
+.registration-brand::before {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(236, 247, 231, .22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .1);
+  content: "📚";
+  font-size: 18px;
+}
+
+.registration-brand strong {
+  color: #fff;
+  font-size: 19px;
+}
+
+.story-copy {
+  max-width: 440px;
+  padding: 42px 0;
+}
+
+.story-copy h1 {
+  font-size: clamp(30px, 3.15vw, 44px);
+  line-height: 1.55;
+}
+
+.story-copy > p:not(.story-eyebrow) {
+  margin: 14px 0 23px;
+}
+
+.story-list {
+  gap: 11px;
+}
+
+.registration-book-art {
+  position: absolute;
+  right: 5%;
+  bottom: 11%;
+  width: 210px;
+  height: 185px;
+  opacity: .78;
+  pointer-events: none;
+}
+
+.book-art-glow {
+  position: absolute;
+  inset: 15px 0 0 18px;
+  border-radius: 50%;
+  background: rgba(185, 222, 161, .15);
+  filter: blur(3px);
+}
+
+.book-art-card {
+  position: absolute;
+  right: 13px;
+  bottom: 10px;
+  display: flex;
+  width: 130px;
+  height: 146px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 17px;
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 8px 18px 18px 8px;
+  background: linear-gradient(145deg, #f6ecd1, #d6e0bc);
+  box-shadow: 0 18px 32px rgba(5, 25, 13, .24), inset 7px 0 rgba(111, 138, 97, .12);
+  color: #31513a;
+  transform: rotate(7deg);
+}
+
+.book-art-card span {
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+}
+
+.book-art-card strong {
+  font-family: Georgia, serif;
+  font-size: 19px;
+  line-height: 1.1;
+}
+
+.book-art-card i {
+  align-self: flex-end;
+  color: #b17b3e;
+  font-size: 19px;
+  font-style: normal;
+}
+
+.book-art-book {
+  position: absolute;
+  display: grid;
+  width: 48px;
+  height: 55px;
+  place-items: center;
+  border: 4px solid rgba(255, 255, 255, .9);
+  border-radius: 7px 12px 12px 7px;
+  background: #fff;
+  box-shadow: 0 9px 18px rgba(5, 25, 13, .2);
+  font-size: 26px;
+}
+
+.book-art-book-one {
+  top: 13px;
+  left: 15px;
+  transform: rotate(-16deg);
+}
+
+.book-art-book-two {
+  top: 2px;
+  right: 24px;
+  transform: rotate(12deg);
+}
+
+.book-art-book-three {
+  bottom: 11px;
+  left: 2px;
+  transform: rotate(-7deg);
+}
+
+.registration-main {
+  min-height: 100vh;
+  padding: 76px clamp(24px, 4.3vw, 66px) 28px;
+}
+
+.registration-form-wrap {
+  max-width: 680px;
+  padding: 27px clamp(25px, 3.2vw, 40px);
+  border: 1px solid rgba(222, 232, 217, .9);
+  border-radius: 25px;
+  box-shadow: 0 22px 70px rgba(37, 65, 42, .09), 0 3px 10px rgba(37, 65, 42, .035);
+}
+
+.form-heading {
+  margin-bottom: 19px;
+}
+
+.form-eyebrow {
+  margin-bottom: 7px;
+}
+
+.form-heading h2 {
+  font-size: clamp(22px, 2.1vw, 28px);
+  line-height: 1.45;
+}
+
+.form-heading > p:last-child {
+  margin-top: 5px;
+}
+
+.form-grid {
+  gap: 13px 15px;
+}
+
+.field {
+  gap: 5px;
+}
+
+.field input,
+.field select {
+  min-height: 43px;
+  padding: 0 13px;
+  border-radius: 11px;
+  font-size: 11px;
+}
+
+.password-input-wrap input {
+  padding-right: 43px;
+}
+
+.terms-check {
+  margin-top: 14px;
+}
+
+.register-button {
+  min-height: 45px;
+  margin-top: 13px;
+}
+
+.privacy-note {
+  margin-top: 10px;
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+.auth-switch {
+  margin-top: 11px;
+  font-size: 10px;
+}
+
+.registration-theme-toggle,
+.registration-language-toggle {
+  top: 18px;
+}
+
+.registration-theme-toggle {
+  right: 22px;
+}
+
+.registration-language-toggle {
+  right: 139px;
+}
+
+.dark-theme.registration-page {
+  background:
+    radial-gradient(ellipse at 82% 12%, rgba(73, 111, 70, .24), transparent 31%),
+    #111b14;
+}
+
+.dark-theme .registration-form-wrap {
+  border-color: #304637;
+  background: #18251c;
+}
+
+@media (max-width: 900px) {
+  .registration-page {
+    grid-template-columns: minmax(290px, .78fr) minmax(0, 1.22fr);
+  }
+
+  .registration-story {
+    padding-right: 30px;
+    padding-left: 30px;
+  }
+
+  .registration-book-art {
+    right: -12px;
+    bottom: 9%;
+    transform: scale(.82);
+    transform-origin: bottom right;
+  }
+
+  .registration-main {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+}
+
+@media (max-width: 700px) {
+  .registration-page {
+    display: block;
+    min-height: 100vh;
+    padding: 0 15px 28px;
+  }
+
+  .registration-story {
+    display: block;
+    min-height: 0;
+    margin: 0 -15px;
+    padding: 22px 23px 24px;
+    border-radius: 0 0 26px 26px;
+  }
+
+  .registration-brand::before {
+    width: 34px;
+    height: 34px;
+  }
+
+  .registration-brand strong {
+    font-size: 17px;
+  }
+
+  .story-copy {
+    margin: 26px 0 0;
+    padding: 0;
+  }
+
+  .story-copy h1 {
+    max-width: 390px;
+    font-size: clamp(25px, 6vw, 34px);
+  }
+
+  .story-copy > p:not(.story-eyebrow) {
+    max-width: 390px;
+    margin: 9px 0 14px;
+    font-size: 11px;
+  }
+
+  .story-list {
+    display: none;
+  }
+
+  .story-footer,
+  .registration-book-art {
+    display: none;
+  }
+
+  .registration-main {
+    min-height: 0;
+    padding: 20px 0 0;
+  }
+
+  .registration-mobile-brand {
+    display: none;
+  }
+
+  .registration-form-wrap {
+    max-width: none;
+    padding: 22px 19px;
+    border-radius: 20px;
+  }
+
+  .registration-theme-toggle,
+  .registration-language-toggle {
+    top: 16px;
+  }
+
+  .registration-theme-toggle {
+    right: 14px;
+  }
+
+  .registration-language-toggle {
+    right: 129px;
+  }
+}
+
+@media (max-width: 480px) {
+  .registration-page {
+    padding-right: 11px;
+    padding-left: 11px;
+  }
+
+  .registration-story {
+    margin-right: -11px;
+    margin-left: -11px;
+    padding-right: 17px;
+    padding-left: 17px;
+  }
+
+  .registration-form-wrap {
+    padding: 20px 15px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .form-heading {
+    margin-bottom: 16px;
+  }
+
+  .form-heading h2 {
+    font-size: 22px;
+  }
+
+  .registration-theme-toggle {
+    right: 11px;
+  }
+
+  .registration-language-toggle {
+    right: 123px;
   }
 }
 
