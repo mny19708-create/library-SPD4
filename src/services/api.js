@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-export const apiConfigured = Boolean(import.meta.env.VITE_API_BASE_URL);
+const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL;
+export const apiConfigured = Boolean(configuredBaseUrl && configuredBaseUrl !== 'local');
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: apiConfigured ? configuredBaseUrl : '/api',
   headers: {
     'Content-Type': 'application/json',
   },

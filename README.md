@@ -6,23 +6,19 @@ Responsive online library app for searching catalogs, reading public-domain eboo
 
 ```sh
 npm install
+Copy-Item .env.example .env
+Copy-Item backend/.env.example backend/.env
 npm run dev
 ```
 
-The online catalog works without a configured library API by searching Project Gutenberg through Gutendex and Open Library. Copy `.env.example` to `.env` and set `VITE_API_BASE_URL` to include the institution's own catalog.
+Set the PostgreSQL/Supabase connection values, a random `JWT_SECRET`, and `ADMIN_USERNAME` in `backend/.env`. Run `npm run admin:password` in an interactive terminal to set an Admin password; input is hidden and the script stores only a bcrypt hash in the ignored `backend/.env` file. Do not copy real credentials into `.env.example`. The `.env` files are local-only and must not be committed. The single `npm run dev` command starts the Vue app and API; Vite forwards `/api` requests to Express. Set `VITE_API_BASE_URL=local` in `.env` only when intentionally using the browser-only demo mode.
+
+Open `http://localhost:5173/admin` or use “ចូលផ្នែកអ្នកគ្រប់គ្រង” on the sign-in screen. Admin access uses the configured username and bcrypt password hash and can manage catalog books. Admin credentials are not the same as student credentials.
+
+The backend uses the existing books table where available, creates the student-account and reading-list tables automatically, and exposes `/api/auth/register`, `/api/auth/login`, `/api/books`, `/api/books/search`, and `/api/reading-list`. Reading history is associated with the signed-in student and PostgreSQL; browser storage is retained as a local cache.
+
+The online catalog also searches Project Gutenberg through Gutendex and Open Library.
 
 ## MySQL schema
 
-`database/schema.sql` creates the MySQL 8.0.16+ schema for users, rooms, bookings, books, book reservations, borrow logs, point transactions, and certificates. Run it with a MySQL client to create the `leafline_library` database. The frontend still needs a backend API to read and write these tables.
-
-The existing SQL schema still contains the institution's room and physical-loan tables; these services are not exposed in the current online-reading app.
-
-## API integration
-
-- `POST /auth/register` accepts `full_name`, `student_id`, `email`, `faculty`, `year`, `phone`, and `password`; return an authentication `token` on success.
-- `POST /auth/login` accepts `email` and `password`; return an authentication `token` and a `user` profile (`full_name`, `student_id`, `email`, `faculty`, `year`, `phone`, and optional `avatar`).
-- `GET /books` and `GET /books/search?q=...` return inventory and catalog records. Include `digital_url` for an authorized PDF/reader URL and/or `digital_content` for licensed plain-text content; the app displays these in its in-app reader.
-- Online searches query both Project Gutenberg and Open Library. Public-domain Gutenberg text and available Open Library scans open in the in-app reader; institution-provided text content is shown in a paginated reader. Borrow-only or metadata-only records link to their source.
-- The personal read list is stored in browser local storage.
-
-Without `VITE_API_BASE_URL`, registration creates a demo account in this browser only. A PBKDF2 password verifier is saved locally, not the original password. Real account creation and authentication require the `/auth/register` and `/auth/login` backend endpoints.
+`database/schema.sql` remains the separate MySQL 8.0.16+ schema for the institution's room and physical-loan system. The integrated Vue app backend uses PostgreSQL/Supabase and `backend/schema.sql`; do not run the MySQL schema against PostgreSQL.

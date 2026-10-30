@@ -1,5 +1,6 @@
 <template>
-	<div v-if="!student" v-translate="locale" class="registration-page" :class="{ 'dark-theme': darkTheme }" :lang="locale">
+	<AdminView v-if="adminMode" :locale="locale" @exit="closeAdminLogin" />
+	<div v-else-if="!student" v-translate="locale" class="registration-page" :class="{ 'dark-theme': darkTheme }" :lang="locale">
 		<button class="theme-toggle registration-theme-toggle" type="button" :aria-label="darkTheme ? 'ប្តូរទៅពណ៌ស' : 'ប្តូរទៅពណ៌ងងឹត'" @click="toggleTheme">
 			<span aria-hidden="true">{{ darkTheme ? '☀' : '☾' }}</span>{{ darkTheme ? 'ពណ៌ស' : 'ពណ៌ងងឹត' }}
 		</button>
@@ -36,6 +37,7 @@
 					<p v-if="registrationError" class="registration-error" role="alert">{{ registrationError }}</p>
 					<button class="register-button" type="submit" :disabled="registering">{{ registering ? (locale === 'km' ? 'កំពុងចូលគណនី…' : 'Signing in…') : (locale === 'km' ? 'ចូលគណនី' : 'Sign in') }} <span>→</span></button>
 					<p class="auth-switch">{{ locale === 'km' ? 'មិនទាន់មានគណនីមែនទេ?' : 'New here?' }} <button type="button" @click="switchAuthMode(false)">{{ locale === 'km' ? 'បង្កើតគណនី' : 'Create an account' }}</button></p>
+					<p class="auth-switch"><button type="button" @click="openAdminLogin">{{ locale === 'km' ? 'ចូលផ្នែកអ្នកគ្រប់គ្រង' : 'Admin sign in' }}</button></p>
 				</form>
 				<form v-else class="registration-form" @submit.prevent="registerStudent">
 					<div class="form-grid">
@@ -161,9 +163,10 @@
 </template>
 
 <script setup>
-import { computed, provide, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, provide, ref } from 'vue';
 import CatalogView from '@/views/CatalogView.vue';
 import ReadingListView from '@/views/ReadingListView.vue';
+import AdminView from '@/views/AdminView.vue';
 import api, { apiConfigured } from '@/services/api';
 import { BookOpen, BookmarkCheck } from '@lucide/vue';
 
@@ -181,6 +184,7 @@ const menuOpen = ref(false);
 const darkTheme = ref(localStorage.getItem('leafline_theme') !== 'light');
 const locale = ref(localStorage.getItem('leafline_locale') === 'en' ? 'en' : 'km');
 const student = ref(null);
+const adminMode = ref(window.location.pathname === '/admin' || Boolean(localStorage.getItem('leafline_admin_session')));
 const registering = ref(false);
 const registrationError = ref('');
 const isLogin = ref(false);
@@ -504,6 +508,25 @@ function navigate(page) {
 	currentPage.value = target;
 	menuOpen.value = false;
 }
+
+function openAdminLogin() {
+	adminMode.value = true;
+	window.history.pushState({}, '', '/admin');
+}
+
+function closeAdminLogin() {
+	adminMode.value = false;
+	localStorage.removeItem('leafline_admin_session');
+	localStorage.removeItem('token');
+	window.history.pushState({}, '', '/');
+}
+
+function handleHistoryNavigation() {
+	adminMode.value = window.location.pathname === '/admin';
+}
+
+onMounted(() => window.addEventListener('popstate', handleHistoryNavigation));
+onBeforeUnmount(() => window.removeEventListener('popstate', handleHistoryNavigation));
 
 </script>
 

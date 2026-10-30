@@ -57,6 +57,7 @@
       <p>{{ selectedTopic ? `សៀវភៅ ${selectedTopic.label} ដែលមានឯកសារឌីជីថលអាចអានបាន` : searchQuery ? `សម្រាប់ “${searchQuery}”` : 'កាតាឡុកសៀវភៅអានដោយសេរីពី Project Gutenberg និង Open Library' }}</p></div>
       <span class="result-count">{{ khmerNumber(filteredBooks.length) }} ចំណងជើង</span>
     </div>
+    <p v-if="readingSyncError" class="reading-sync-error" role="alert">{{ readingSyncError }}</p>
     <p class="online-attribution">សៀវភៅឥតគិតថ្លៃមានកំណត់តាមច្បាប់រក្សាសិទ្ធិនៃប្រទេសនីមួយៗ។ ប្រភព៖ <a href="https://www.gutenberg.org" target="_blank" rel="noopener noreferrer">Project Gutenberg</a> និង <a href="https://openlibrary.org" target="_blank" rel="noopener noreferrer">Open Library</a>.</p>
 
     <section class="book-grid" aria-label="បញ្ជីសៀវភៅ">
@@ -163,6 +164,7 @@ const READ_BOOKS_KEY = 'leafline_read_books';
 const books = ref([]);
 const allBooks = ref([]);
 const readBooks = ref([]);
+const readingSyncError = ref('');
 const searchQuery = ref('');
 const selectedTopic = ref(null);
 const sourceFilter = ref('all');
@@ -384,13 +386,25 @@ function cleanGutenbergText(text) {
     .trim();
 }
 
-function loadReadBooks() {
+async function loadReadBooks() {
   try {
     const saved = JSON.parse(localStorage.getItem(READ_BOOKS_KEY) || '[]');
     readBooks.value = Array.isArray(saved) ? saved : [];
   } catch (error) {
     console.error('Unable to load read books:', error);
     readBooks.value = [];
+  }
+  if (!apiConfigured) return;
+
+  try {
+    const { data } = await api.get('/reading-list');
+    if (!Array.isArray(data)) throw new Error('Reading-list API returned an invalid response.');
+    readBooks.value = data;
+    localStorage.setItem(READ_BOOKS_KEY, JSON.stringify(data));
+    readingSyncError.value = '';
+  } catch (error) {
+    console.error('Unable to load reading history from account:', error);
+    readingSyncError.value = 'មិនអាចភ្ជាប់បញ្ជីសៀវភៅទៅគណនីបានទេ។ សូមចូលគណនីឡើងវិញ ឬពិនិត្យការភ្ជាប់។';
   }
 }
 
@@ -409,11 +423,31 @@ function markRead(book) {
   };
   readBooks.value = [record, ...readBooks.value.filter(item => String(item.id) !== String(book.id))];
   localStorage.setItem(READ_BOOKS_KEY, JSON.stringify(readBooks.value));
-  window.dispatchEvent(new Event('leafline-reading-updated'));
+  if (!apiConfigured) {
+    window.dispatchEvent(new Event('leafline-reading-updated'));
+  } else {
+    api.put('/reading-list', record).then(() => {
+      readingSyncError.value = '';
+      window.dispatchEvent(new Event('leafline-reading-updated'));
+    }).catch(error => {
+      console.error('Unable to sync reading history:', error);
+      readingSyncError.value = 'មិនអាចរក្សាទុកសៀវភៅនេះទៅគណនីបានទេ។ សូមចូលគណនីឡើងវិញ ហើយព្យាយាមម្ដងទៀត។';
+    });
+  }
 }
 
-function toggleRead(book) {
+async function toggleRead(book) {
   if (isRead(book.id)) {
+    if (apiConfigured) {
+      try {
+        await api.delete('/reading-list', { params: { id: book.id } });
+        readingSyncError.value = '';
+      } catch (error) {
+        console.error('Unable to remove book from account reading history:', error);
+        readingSyncError.value = 'មិនអាចធ្វើបច្ចុប្បន្នភាពបញ្ជីសៀវភៅបានទេ។ សូមព្យាយាមម្ដងទៀត។';
+        return;
+      }
+    }
     readBooks.value = readBooks.value.filter(item => String(item.id) !== String(book.id));
     localStorage.setItem(READ_BOOKS_KEY, JSON.stringify(readBooks.value));
     window.dispatchEvent(new Event('leafline-reading-updated'));
@@ -888,6 +922,7 @@ button{font:inherit}button:focus-visible,input:focus-visible{outline:3px solid #
 .book-actions .source-link{border-color:#dce9dc;background:#f4faf3;color:#347653}
 .reader-loading{display:flex;min-height:54px;align-items:center;justify-content:center;gap:10px;padding:12px 20px;color:#607366;font-size:12px;font-weight:700}
 .reader-loading-spinner{width:17px;height:17px;flex-shrink:0;border:2px solid #dce9dc;border-top-color:#347653;border-radius:50%;animation:reader-spin .75s linear infinite}
+.reading-sync-error{margin:0 0 14px;padding:10px 13px;border:1px solid #f0d5cf;border-radius:10px;background:#fff4f1;color:#a45043;font-size:11px;line-height:1.7}
 @keyframes reader-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.reader-loading-spinner{animation-duration:1.8s}}
 .reader-error{color:#b45245}
