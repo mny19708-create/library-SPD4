@@ -215,7 +215,7 @@ const showToast = (message, type = 'success') => {
 // Fetch Ebooks
 const fetchEbooks = async () => {
   try {
-    const res = await axios.get('http://localhost:5000/api/ebooks')
+    const res = await axios.get('/api/ebooks')
     if (res.data.success) {
       ebooks.value = res.data.data
     }
