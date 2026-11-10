@@ -148,7 +148,7 @@ const saveOnePDF = async (cert) => {
   const storedUser = getStoredUser()
   const userName = storedUser ? (storedUser.username || storedUser.name) : 'Student'
 
-  const response = await axios.post('http://localhost:5000/api/certificates/generate', {
+  const response = await axios.post('/api/certificates/generate', {
     userName: userName,
     ebookTitle: cert.ebook_title,
     readingMinutes: certMinutes(cert),
