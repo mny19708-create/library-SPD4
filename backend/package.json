@@ -10,7 +10,7 @@
     "pg": "^8.23.1"
   },
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
+   
     "start": "node server.js"
   }
 }
