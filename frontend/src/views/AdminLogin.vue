@@ -2,7 +2,7 @@
   <div class="admin-login-container">
     <div class="login-card">
       <div class="login-header">
-        <div class="logo-icon">1🛡️</div>
+        <div class="logo-icon">🛡️</div>
         <h2>Admin Portal</h2>
         <p>Sign in to access Ebook Master Admin</p>
       </div>
