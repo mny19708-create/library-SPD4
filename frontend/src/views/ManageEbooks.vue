@@ -229,7 +229,7 @@ const fetchEbooks = async () => {
 // Fetch Categories
 const fetchCategories = async () => {
   try {
-    const res = await axios.get('http://localhost:5000/api/categories')
+    const res = await axios.get('/api/categories')
     if (res.data.success) {
       categories.value = res.data.data
     }
@@ -256,10 +256,10 @@ const saveEbook = async () => {
   isSaving.value = true
   try {
     if (isEditing.value) {
-      await axios.put(`http://localhost:5000/api/ebooks/${editId.value}`, form.value)
+      await axios.put(`/api/ebooks/${editId.value}`, form.value)
       showToast('✨ Volume archive updated successfully!')
     } else {
-      await axios.post('http://localhost:5000/api/ebooks/add', form.value)
+      await axios.post('/api/ebooks/add', form.value)
       showToast('✨ New volume registered successfully!')
     }
     await fetchEbooks()
@@ -291,7 +291,7 @@ const confirmDelete = async () => {
   deleteTarget.value = null
   if (!target) return
   try {
-    await axios.delete(`http://localhost:5000/api/ebooks/${target.id}`)
+    await axios.delete(`/api/ebooks/${target.id}`)
     showToast('Volume successfully exiled')
     fetchEbooks()
   } catch (err) {
