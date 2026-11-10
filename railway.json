@@ -1,9 +1,9 @@
 {
-  "name": "library-spd4",
-  "private": true,
-  "scripts": {
-    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
-    "start": "cd backend && node server.js"
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "npm run build"
   },
-  "engines": { "node": "18.x" }
+  "deploy": {
+    "startCommand": "cd backend && node server.js"
+  }
 }
