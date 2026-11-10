@@ -136,7 +136,7 @@ const countUp = (key, target) => {
   requestAnimationFrame(tick)
 }
 
-const API = 'http://localhost:5000/api'
+const API = '/api'
 
 // Count items from a list endpoint (supports [..], {data:[..]} or {count:n})
 const getCount = async (path) => {
