@@ -83,7 +83,7 @@ import HeaderHome from '@/components/HeaderHome.vue'
 import FooterHome from '@/components/FooterHome.vue'
 import axios from 'axios'
 
-const API = 'http://localhost:5000/api/users'
+const API = '/api/users'
 
 const form = ref({ username: '', email: '', password: '' })
 const isLoading = ref(false)
