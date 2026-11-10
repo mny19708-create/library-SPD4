@@ -8,5 +8,8 @@
     "jsonwebtoken": "^9.0.3",
     "pdfkit": "^0.20.2",
     "pg": "^8.23.1"
+  },
+  "scripts": {
+    "start": "node server.js"
   }
 }
