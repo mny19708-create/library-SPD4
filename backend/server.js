@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-
+const distPath = path.join(__dirname, 'dist');
 const app = express();
 const path = require('path');
 // Middleware
