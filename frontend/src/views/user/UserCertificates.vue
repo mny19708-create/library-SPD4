@@ -133,7 +133,7 @@ const fetchCertificates = async () => {
     const userId = storedUser && (storedUser.id || storedUser.user_id)
     if (!userId) return
 
-    const res = await axios.get(`http://localhost:5000/api/certificates/user/${userId}`)
+    const res = await axios.get(`/api/certificates/user/${userId}`)
     if (res.data.success) {
       certificates.value = res.data.data
     }
