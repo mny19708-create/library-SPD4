@@ -249,7 +249,7 @@ const statusClass = computed(() => {
   return 'active'
 })
 
-const API = 'http://localhost:5000/api'
+const API = '/api'
 let lastSavedSeconds = -1
 const progressReady = ref(false)
 const windowFocused = ref(true)
@@ -398,7 +398,7 @@ const finishReading = async () => {
     const userId = storedUser ? storedUser.id : null
     const fallbackUsername = storedUser ? (storedUser.username || storedUser.name) : 'Scholar'
 
-    const claimRes = await axios.post('http://localhost:5000/api/certificates/claim', {
+    const claimRes = await axios.post('/api/certificates/claim', {
       user_id: userId,
       ebook_id: ebook.value.id,
       reading_duration_minutes: actualMinutes
@@ -408,7 +408,7 @@ const finishReading = async () => {
       alert('🎉 ' + claimRes.data.message)
       const finalUsername = claimRes.data.certificate_data?.username || fallbackUsername
 
-      const pdfRes = await axios.post('http://localhost:5000/api/certificates/generate', {
+      const pdfRes = await axios.post('/api/certificates/generate', {
         userName: finalUsername,
         ebookTitle: ebook.value.title,
         readingMinutes: actualMinutes,
