@@ -32,12 +32,12 @@ app.use('/api/stats', require('./routes/stats'))
 
 app.use('/api/favorites', favoriteRoutes);
 // 1. បញ្ជាក់ទីតាំងថត build របស់ Frontend (dist)
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+const distPath = path.join(__dirname, '../frontend/dist');
 
 // 2. SPA Fallback (ប្រើ Regular Expression)
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-});
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+})
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
