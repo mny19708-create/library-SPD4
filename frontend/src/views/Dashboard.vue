@@ -144,7 +144,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
 
-const API = 'http://localhost:5000/api'
+const API = '/api'
 
 const ebooks = ref([])
 const categories = ref([])
