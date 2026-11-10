@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 
 // ទីតាំងថត build របស់ Frontend (ត្រូវនៅក្រោម path និង app)
-const distPath = path.join(__dirname, 'dist');
+const distPath = path.join(__dirname, 'frontend', 'dist');
 
 // Middleware
 app.use(cors());
