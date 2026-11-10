@@ -6,8 +6,14 @@ require('dotenv').config();
 const app = express();
 
 // ទីតាំងថត build របស់ Frontend (ត្រូវនៅក្រោម path និង app)
-const distPath = path.join(__dirname, '..', 'frontend', 'dist');
-
+{
+  "name": "library-spd4",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "start": "cd backend && node server.js"
+  }
+}
 // Middleware
 app.use(cors());
 app.use(express.json());
