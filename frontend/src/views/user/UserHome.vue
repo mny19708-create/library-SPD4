@@ -29,7 +29,8 @@
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.3-4.3" />
             </svg>
-            <input type="text" v-model="searchQuery" placeholder="Consult the catalogue by title..."
+            <input type="text" v-model="searchQuery"
+              placeholder="Search by title, author, category or keyword..."
               @input="currentPage = 1" />
             <button v-if="searchQuery" class="clear-btn" @click="searchQuery = ''; currentPage = 1"
               aria-label="Clear">✕</button>
@@ -50,8 +51,9 @@
     <section class="content">
       <!-- Index tabs -->
       <div class="category-tabs">
-        <button v-for="cat in categories" :key="cat" :class="{ active: selectedCategory === cat }"
-          @click="selectedCategory = cat; currentPage = 1">
+        <button v-for="cat in categories" :key="cat"
+          :class="{ active: !isSearching && selectedCategory === cat }"
+          @click="selectedCategory = cat; searchQuery = ''; currentPage = 1">
           {{ cat }}
         </button>
       </div>
@@ -190,16 +192,15 @@ const getUserId = () => {
   }
   return null
 }
-// បន្ថែម Function សម្រាប់ពិនិត្យការ Login មុននឹងអនុញ្ញាតឱ្យមើលលម្អិត ឬអានសៀវភៅ
+
+// ពិនិត្យការ Login មុននឹងអនុញ្ញាតឱ្យមើលលម្អិត ឬអានសៀវភៅ
 const checkAuthAndGo = (actionType, id) => {
-  const user = localStorage.getItem('user') // ពិនិត្យមើលទិន្នន័យ user ក្នុង localStorage
-  
+  const user = localStorage.getItem('user')
+
   if (!user) {
-    // បើមិនទាន់ Login ទេ ឱ្យបង្ហាញសារព្រមាន និងបង្វែរទំព័រទៅកាន់ /auth (Login/Register)
     alert('📜 សូមធ្វើការ Sign In ឬ Enroll (Login) ជាមុនសិន ដើម្បីមើលលម្អិត ឬអានវ៉ុនសៀវភៅនេះ!')
     router.push('/auth')
   } else {
-    // បើបាន Login ហើយ ឱ្យចូលទៅតាមមុខងារធម្មតា
     if (actionType === 'detail') {
       router.push(`/ebook/${id}`)
     } else if (actionType === 'read') {
@@ -207,6 +208,7 @@ const checkAuthAndGo = (actionType, id) => {
     }
   }
 }
+
 // Required minutes set by admin
 const requiredMinutes = (ebook) => Number(ebook.estimated_reading_time) || 10
 
@@ -326,12 +328,50 @@ const categories = computed(() => {
   return ['All', ...new Set(cats)]
 })
 
+/* ================= UNIVERSAL SEARCH ================= */
+
+// lowercase + លុប diacritics (é → e) ដើម្បីរកឃើញងាយ
+const normalize = (value) =>
+  String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+
+// field ដែលមិនគួរយកមកស្វែងរក (URL, path, id ។ល។)
+const SKIP_KEYS = /(^id$|_id$|url|image|cover|file|path|link|created|updated)/i
+
+// បង្កើត "searchable text" សម្រាប់សៀវភៅនីមួយៗ ពី field អក្សរ/លេខទាំងអស់
+const searchIndex = computed(() => {
+  const map = new Map()
+  for (const ebook of ebooks.value) {
+    const parts = []
+    for (const [key, val] of Object.entries(ebook)) {
+      if (SKIP_KEYS.test(key)) continue
+      if (typeof val === 'string' || typeof val === 'number') parts.push(val)
+      else if (Array.isArray(val)) parts.push(...val.filter(v => typeof v === 'string'))
+    }
+    // ធានាថា category មាន 'General' ដូចដែលបង្ហាញលើ UI
+    if (!ebook.category_name) parts.push('General')
+    map.set(ebook.id, normalize(parts.join(' ')))
+  }
+  return map
+})
+
+const isSearching = computed(() => searchQuery.value.trim().length > 0)
+
 const filteredEbooks = computed(() => {
+  const tokens = normalize(searchQuery.value).split(/\s+/).filter(Boolean)
+
   return ebooks.value.filter(ebook => {
-    const matchesSearch = ebook.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const ebookCat = ebook.category_name || 'General'
-    const matchesCategory = selectedCategory.value === 'All' || ebookCat === selectedCategory.value
-    return matchesSearch && matchesCategory
+    // មិនកំពុងស្វែងរក → ប្រើ tab category ធម្មតា
+    if (tokens.length === 0) {
+      const ebookCat = ebook.category_name || 'General'
+      return selectedCategory.value === 'All' || ebookCat === selectedCategory.value
+    }
+    // កំពុងស្វែងរក → រកក្នុងគ្រប់ field ហើយពាក្យទាំងអស់ត្រូវតែមាន
+    const haystack = searchIndex.value.get(ebook.id) || ''
+    return tokens.every(t => haystack.includes(t))
   })
 })
 
