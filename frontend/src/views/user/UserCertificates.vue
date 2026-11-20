@@ -74,6 +74,7 @@
             <span class="chip" v-if="issuedDate(cert)">📅 {{ issuedDate(cert) }}</span>
           </div>
 
+<<<<<<< HEAD
           <div class="card-actions">
             <button
               @click="openCustomizer(cert)"
@@ -94,6 +95,19 @@
               </template>
             </button>
           </div>
+=======
+          <button
+            @click="downloadPDF(cert)"
+            class="btn-download"
+            :disabled="downloadingId === cert.id"
+          >
+            <span v-if="downloadingId === cert.id" class="spinner"></span>
+            <template v-else>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+              Download PDF
+            </template>
+          </button>
+>>>>>>> feature/ebookfullstack
         </article>
       </div>
 
@@ -106,6 +120,7 @@
       </div>
     </section>
 
+<<<<<<< HEAD
     <!-- ================= CUSTOMIZE TEMPLATE MODAL ================= -->
     <div v-if="showModal && selectedCert" class="modal-backdrop" @click.self="closeModal">
       <div class="modal-box">
@@ -229,12 +244,18 @@
       </div>
     </div>
 
+=======
+>>>>>>> feature/ebookfullstack
     <FooterHome />
   </div>
 </template>
 
 <script setup>
+<<<<<<< HEAD
 import { ref, reactive, computed, onMounted } from 'vue'
+=======
+import { ref, computed, onMounted } from 'vue'
+>>>>>>> feature/ebookfullstack
 import axios from 'axios'
 import HeaderHome from '@/components/HeaderHome.vue'
 import FooterHome from '@/components/FooterHome.vue'
@@ -245,6 +266,7 @@ const downloadingId = ref(null)
 const downloadingAll = ref(false)
 const allProgress = ref(0)
 
+<<<<<<< HEAD
 // Customizer states
 const showModal = ref(false)
 const selectedCert = ref(null)
@@ -267,10 +289,16 @@ const customForm = reactive({
   customBg: ''
 })
 
+=======
+>>>>>>> feature/ebookfullstack
 const totalMinutes = computed(() =>
   certificates.value.reduce((sum, c) => sum + certMinutes(c), 0)
 )
 
+<<<<<<< HEAD
+=======
+// minutes the user really read (seconds are the most exact value)
+>>>>>>> feature/ebookfullstack
 const certMinutes = (cert) => {
   const fromSeconds = Math.floor((Number(cert.reading_seconds) || 0) / 60)
   return Math.max(fromSeconds, Math.floor(Number(cert.reading_duration_minutes) || 0))
@@ -297,6 +325,7 @@ const fetchCertificates = async () => {
   }
 }
 
+<<<<<<< HEAD
 // Open Customizer Modal
 const openCustomizer = (cert) => {
   const storedUser = getStoredUser()
@@ -364,6 +393,8 @@ const downloadCustomFromServer = async () => {
   }
 }
 
+=======
+>>>>>>> feature/ebookfullstack
 const saveOnePDF = async (cert) => {
   const storedUser = getStoredUser()
   const userName = storedUser ? (storedUser.username || storedUser.name) : 'Student'
@@ -400,6 +431,10 @@ const downloadPDF = async (cert) => {
   }
 }
 
+<<<<<<< HEAD
+=======
+// Save every certificate, one after another (small pause so the browser accepts multiple downloads)
+>>>>>>> feature/ebookfullstack
 const downloadAll = async () => {
   if (downloadingAll.value || certificates.value.length === 0) return
   downloadingAll.value = true
@@ -431,6 +466,10 @@ const issuedDate = (cert) => {
   return isNaN(date) ? '' : date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
+<<<<<<< HEAD
+=======
+// Wax seal colours: burgundy, forest green, navy, umber, plum
+>>>>>>> feature/ebookfullstack
 const waxes = [
   ['#a52a2a', '#5a1010'],
   ['#3f6b45', '#1a2e1e'],
@@ -687,6 +726,7 @@ onMounted(() => {
   border-radius: 2px;
 }
 
+<<<<<<< HEAD
 .card-actions {
   display: flex;
   flex-direction: column;
@@ -715,15 +755,23 @@ onMounted(() => {
 }
 .btn-customize:hover { filter: brightness(1.06); transform: translateY(-1px); }
 
+=======
+>>>>>>> feature/ebookfullstack
 .btn-download {
   width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+<<<<<<< HEAD
   padding: 11px 16px;
   font-family: 'Cinzel', serif;
   font-size: 12.5px;
+=======
+  padding: 12px 16px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+>>>>>>> feature/ebookfullstack
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -747,6 +795,7 @@ onMounted(() => {
   animation: spin 0.7s linear infinite;
 }
 
+<<<<<<< HEAD
 /* ================= MODAL CUSTOMIZER ================= */
 .modal-backdrop {
   position: fixed;
@@ -1017,6 +1066,8 @@ onMounted(() => {
 }
 .modal-dl { width: auto; }
 
+=======
+>>>>>>> feature/ebookfullstack
 /* ================= EMPTY ================= */
 .empty {
   max-width: 460px;
@@ -1063,6 +1114,7 @@ onMounted(() => {
 @keyframes shimmer { to { background-position: -200% 0; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+<<<<<<< HEAD
 /* ================= PRINT STYLES (Save Custom Certificate as PDF) ================= */
 @media print {
   body * { visibility: hidden; }
@@ -1086,6 +1138,8 @@ onMounted(() => {
   .modal-body { grid-template-columns: 1fr; }
 }
 
+=======
+>>>>>>> feature/ebookfullstack
 @media (max-width: 640px) {
   .hero { padding: 30px 14px 80px; }
   .hero-frame { padding: 38px 16px 30px; }
@@ -1093,4 +1147,8 @@ onMounted(() => {
   .content { padding: 0 14px 50px; }
   .cert-grid { grid-template-columns: 1fr; }
 }
+<<<<<<< HEAD
 </style>
+=======
+</style>
+>>>>>>> feature/ebookfullstack
